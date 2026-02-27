@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from "react";
 import { Department, GreenSkill, ViewLevel } from "@/lib/types";
 import { getSkillSeverityColor, formatScore, OPT_COLUMNS, formatOptLabel, computeAvgOpt, optScoreColor, skillsForDept } from "@/lib/utils";
-import { getTopPrioritySkills, getQuickWins, getComplianceRiskSkills, computeSkillRiskScore, getMaturityLabel, computeDeptRiskScore } from "@/lib/gapAnalysis";
+import { getTopPrioritySkills, getQuickWins, getComplianceRiskSkills, computeSkillRiskScore, getMaturityLabel, computeDeptRiskScore, getPriorityActions } from "@/lib/gapAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import MethodologyModal from "./MethodologyModal";
 
@@ -494,6 +494,45 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                   ))}
                 </div>
               </div>
+
+              {/* Immediate Actions */}
+              {(() => {
+                const actions = getPriorityActions(selectedDept, deptSkills).slice(0, 5);
+                if (actions.length === 0) return null;
+                return (
+                  <div className="px-5 py-3 border-b border-white/5">
+                    <div className="text-[9px] uppercase tracking-wider text-amber-400/60 mb-2">Immediate Actions</div>
+                    <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                      {actions.map((a, i) => {
+                        const aColor = getSkillSeverityColor(a.skill.severity);
+                        return (
+                          <div key={i} className="px-2 py-2 rounded-lg bg-white/[0.03] border border-white/5">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-[9px] font-mono text-white/25 w-3">#{i + 1}</span>
+                              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: aColor }} />
+                              <span className="text-[10px] text-white/80 font-medium truncate flex-1">{a.skill.green_skill}</span>
+                              <span className="text-[8px] px-1 py-0.5 rounded font-medium" style={{ color: aColor, backgroundColor: aColor + "15" }}>
+                                {a.priority || a.skill.severity}
+                              </span>
+                            </div>
+                            {a.action && (
+                              <p className="text-[9px] text-white/50 ml-5 leading-relaxed">{a.action}</p>
+                            )}
+                            <div className="flex flex-wrap gap-1 ml-5 mt-1 text-[8px]">
+                              <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">
+                                {a.currentMaturity} → {a.targetMaturity}
+                              </span>
+                              {a.linkedTheme && (
+                                <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">{a.linkedTheme}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="px-5 py-3 border-b border-white/5">
                 <div className="space-y-1.5 text-[10px]">
