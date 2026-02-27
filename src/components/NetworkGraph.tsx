@@ -2,13 +2,14 @@
 
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import * as d3 from "d3";
-import { Department, DepartmentEdge } from "@/lib/types";
-import { getSeverityGlowColor, computeAvgOpt, optScoreColor } from "@/lib/utils";
+import { Department, DepartmentEdge, GreenSkill } from "@/lib/types";
+import { computeAvgOpt, optScoreColor, skillsForDept } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NetworkGraphProps {
   departments: Department[];
   edges: DepartmentEdge[];
+  allSkills: GreenSkill[];
   onNodeClick: (dept: Department) => void;
 }
 
@@ -30,7 +31,7 @@ interface TooltipData {
   y: number;
 }
 
-export default function NetworkGraph({ departments, edges, onNodeClick }: NetworkGraphProps) {
+export default function NetworkGraph({ departments, edges, allSkills, onNodeClick }: NetworkGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const simulationRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
@@ -41,6 +42,20 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
     svg.selectAll("*").remove();
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
+
+    // Compute gap counts from actual skill data
+    const gapCountMap = new Map<string, { critical: number; moderate: number; noGap: number }>();
+    for (const dept of departments) {
+      const ds = skillsForDept(allSkills, dept);
+      gapCountMap.set(dept.id, {
+        critical: ds.filter(s => s.severity?.toLowerCase() === "critical").length,
+        moderate: ds.filter(s => s.severity?.toLowerCase() === "moderate").length,
+        noGap: ds.filter(s => {
+          const sev = s.severity?.toLowerCase();
+          return sev === "no gap" || sev === "none" || sev === "healthy";
+        }).length,
+      });
+    }
 
     const nodes: SimNode[] = departments.map((dept) => ({
       id: dept.id,
@@ -130,10 +145,11 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
       .attr("fill", (d) => d.color).attr("font-size", "9px").attr("font-weight", "500")
       .style("pointer-events", "none")
       .text((d) => {
+        const gc = gapCountMap.get(d.dept.id) || { critical: 0, moderate: 0, noGap: 0 };
         const parts = [];
-        if (d.dept.critical_gap_count > 0) parts.push(`${d.dept.critical_gap_count} critical`);
-        if (d.dept.moderate_gap_count > 0) parts.push(`${d.dept.moderate_gap_count} moderate`);
-        if (d.dept.no_gap_count > 0) parts.push(`${d.dept.no_gap_count} ready`);
+        if (gc.critical > 0) parts.push(`${gc.critical} critical`);
+        if (gc.moderate > 0) parts.push(`${gc.moderate} moderate`);
+        if (gc.noGap > 0) parts.push(`${gc.noGap} ready`);
         return parts.join(" · ");
       });
 
@@ -164,7 +180,7 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
       .on("drag", (event, d) => { d.fx = event.x; d.fy = event.y; })
       .on("end", (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; });
     nodeGroup.call(drag);
-  }, [departments, edges, onNodeClick]);
+  }, [departments, edges, allSkills, onNodeClick]);
 
   useEffect(() => {
     buildGraph();
@@ -193,9 +209,9 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-white/60">
               <div>Avg Opt Score: <span className="text-white font-medium">{(computeAvgOpt(tooltip.dept) * 100).toFixed(0)}%</span></div>
               <div>Priority: <span className="text-white font-medium">{tooltip.dept.priority_level}</span></div>
-              <div>Critical Gaps: <span className="text-red-400 font-medium">{tooltip.dept.critical_gap_count}</span></div>
-              <div>Moderate Gaps: <span className="text-amber-400 font-medium">{tooltip.dept.moderate_gap_count}</span></div>
-              <div>No Gap: <span className="text-green-400 font-medium">{tooltip.dept.no_gap_count}</span></div>
+              <div>Critical Gaps: <span className="text-red-400 font-medium">{skillsForDept(allSkills, tooltip.dept).filter(s => s.severity?.toLowerCase() === "critical").length}</span></div>
+              <div>Moderate Gaps: <span className="text-amber-400 font-medium">{skillsForDept(allSkills, tooltip.dept).filter(s => s.severity?.toLowerCase() === "moderate").length}</span></div>
+              <div>No Gap: <span className="text-green-400 font-medium">{skillsForDept(allSkills, tooltip.dept).filter(s => { const sev = s.severity?.toLowerCase(); return sev === "no gap" || sev === "none" || sev === "healthy"; }).length}</span></div>
               <div>Desired Knowledge: <span className="text-white font-medium">{tooltip.dept.desired_knowledge}</span></div>
             </div>
             {tooltip.dept.top_gaps && (

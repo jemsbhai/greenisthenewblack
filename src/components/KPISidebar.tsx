@@ -84,10 +84,14 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
   const [showMethodology, setShowMethodology] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("overview");
 
-  const totalCritical = departments.reduce((s, d) => s + (d.critical_gap_count || 0), 0);
-  const totalModerate = departments.reduce((s, d) => s + (d.moderate_gap_count || 0), 0);
-  const totalNoGap = departments.reduce((s, d) => s + (d.no_gap_count || 0), 0);
-  const totalSkills = totalCritical + totalModerate + totalNoGap;
+  // Compute gap counts from actual skill data (source of truth)
+  const totalCritical = allSkills.filter(s => s.severity?.toLowerCase() === "critical").length;
+  const totalModerate = allSkills.filter(s => s.severity?.toLowerCase() === "moderate").length;
+  const totalNoGap = allSkills.filter(s => {
+    const sev = s.severity?.toLowerCase();
+    return sev === "no gap" || sev === "none" || sev === "healthy";
+  }).length;
+  const totalSkills = allSkills.length;
   const readiness = totalSkills > 0 ? ((totalNoGap / totalSkills) * 100).toFixed(0) : "0";
   const avgOptAll = departments.length > 0
     ? (departments.reduce((s, d) => s + computeAvgOpt(d), 0) / departments.length * 100).toFixed(0)
@@ -98,7 +102,22 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
     .sort((a, b) => b.riskScore - a.riskScore)
     .filter(d => d.dept.gap_severity?.toLowerCase() === "critical");
 
-  const sortedDepts = [...departments].sort((a, b) => (b.critical_gap_count || 0) - (a.critical_gap_count || 0));
+  // Sort departments by actual critical gap count from skills data
+  const deptGapCounts = new Map<string, { critical: number; moderate: number; noGap: number }>();
+  for (const d of departments) {
+    const ds = skillsForDept(allSkills, d);
+    deptGapCounts.set(d.id, {
+      critical: ds.filter(s => s.severity?.toLowerCase() === "critical").length,
+      moderate: ds.filter(s => s.severity?.toLowerCase() === "moderate").length,
+      noGap: ds.filter(s => {
+        const sev = s.severity?.toLowerCase();
+        return sev === "no gap" || sev === "none" || sev === "healthy";
+      }).length,
+    });
+  }
+  const sortedDepts = [...departments].sort((a, b) =>
+    (deptGapCounts.get(b.id)?.critical || 0) - (deptGapCounts.get(a.id)?.critical || 0)
+  );
 
   const themes = allSkills.reduce((acc, s) => {
     const t = s.theme || "Other";
@@ -110,9 +129,22 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
     return acc;
   }, {} as Record<string, { critical: number; moderate: number; noGap: number; total: number }>);
 
-  // Priority analytics
-  const topPrioritySkills = getTopPrioritySkills(allSkills, 8);
-  const quickWins = getQuickWins(allSkills);
+  // Build dept opt lookup for display fallback
+  const deptOptMap = new Map<string, number>();
+  for (const d of departments) {
+    const opt = computeAvgOpt(d);
+    deptOptMap.set(d.id, opt);
+    deptOptMap.set(d.department, opt);
+    if (d.label) deptOptMap.set(d.label, opt);
+  }
+  const getSkillOpt = (s: GreenSkill) => {
+    const v = computeAvgOpt(s);
+    return v > 0 ? v : (deptOptMap.get(s.department) ?? 0);
+  };
+
+  // Priority analytics — pass departments for dept-level opt fallback
+  const topPrioritySkills = getTopPrioritySkills(allSkills, 8, departments);
+  const quickWins = getQuickWins(allSkills, departments);
   const complianceRisks = getComplianceRiskSkills(allSkills);
 
   const selectedDeptFactors = selectedDept
@@ -218,7 +250,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                       <div className="flex-1 min-w-0">
                         <span className="text-[11px] text-white/80 font-medium truncate block">{dept.label}</span>
                         <div className="flex gap-2 text-[9px]">
-                          <span className="text-red-400">{dept.critical_gap_count} critical</span>
+                          <span className="text-red-400">{deptGapCounts.get(dept.id)?.critical || 0} critical</span>
                           <span className="text-white/30">Risk: {(riskScore * 100).toFixed(0)}%</span>
                         </div>
                       </div>
@@ -236,7 +268,8 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                 {sortedDepts.map((dept) => {
                   const dAvg = computeAvgOpt(dept);
                   const color = optScoreColor(dAvg);
-                  const total = (dept.critical_gap_count || 0) + (dept.moderate_gap_count || 0) + (dept.no_gap_count || 0);
+                  const gc = deptGapCounts.get(dept.id) || { critical: 0, moderate: 0, noGap: 0 };
+                  const total = gc.critical + gc.moderate + gc.noGap;
                   return (
                     <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02] border border-transparent">
                       <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color, boxShadow: `0 0 4px ${color}66` }} />
@@ -248,9 +281,9 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                         <div className="flex h-1 rounded-full overflow-hidden mt-0.5">
                           {total > 0 && (
                             <>
-                              <div className="bg-red-500" style={{ width: `${((dept.critical_gap_count || 0) / total) * 100}%` }} />
-                              <div className="bg-amber-500" style={{ width: `${((dept.moderate_gap_count || 0) / total) * 100}%` }} />
-                              <div className="bg-green-500" style={{ width: `${((dept.no_gap_count || 0) / total) * 100}%` }} />
+                              <div className="bg-red-500" style={{ width: `${(gc.critical / total) * 100}%` }} />
+                              <div className="bg-amber-500" style={{ width: `${(gc.moderate / total) * 100}%` }} />
+                              <div className="bg-green-500" style={{ width: `${(gc.noGap / total) * 100}%` }} />
                             </>
                           )}
                         </div>
@@ -336,7 +369,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                       <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
                       <span className="text-[10px] text-white/70 truncate flex-1">{skill.green_skill}</span>
                       <span className="text-[8px] text-white/40">{skill.department}</span>
-                      <span className="text-[9px] text-green-400/70 font-mono">{(computeAvgOpt(skill) * 100).toFixed(0)}% impact</span>
+                      <span className="text-[9px] text-green-400/70 font-mono">{(getSkillOpt(skill) * 100).toFixed(0)}% impact</span>
                     </div>
                   ))}
                 </div>
