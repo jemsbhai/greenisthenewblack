@@ -34,6 +34,13 @@ interface MaturityNode extends d3.SimulationNodeDatum {
   valueSkill?: string;
   attitudeSkill?: string;
   skillCount?: number;
+  // Leaf skill node fields
+  isLeaf?: boolean;
+  parentId?: string;
+  severity?: string;
+  gap?: number;
+  skillFamily?: string;
+  greenSkillName?: string;
 }
 
 const MATURITY_COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#22c55e"];
@@ -114,18 +121,45 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       }
     }
 
-    const allNodes = [hubNode, ...maturityNodes];
-    const links = maturityNodes.map((mn) => ({ source: "hub", target: mn.id }));
+    // ── Build skill leaf nodes from green_skills data ──
+    const leafNodes: MaturityNode[] = [];
+    maturityNodes.forEach((mn) => {
+      const levelSkills = skills.filter(s => s.required_level === mn.level);
+      levelSkills.forEach((s, j) => {
+        const sevColor = getSkillSeverityColor(s.severity);
+        leafNodes.push({
+          id: `leaf-${mn.id}-${j}`,
+          label: s.green_skill,
+          isHub: false,
+          isLeaf: true,
+          parentId: mn.id,
+          color: sevColor,
+          radius: 14,
+          level: mn.level,
+          severity: s.severity,
+          gap: s.gap,
+          skillFamily: s.skill_family,
+          greenSkillName: s.green_skill,
+        });
+      });
+    });
+
+    const allNodes = [hubNode, ...maturityNodes, ...leafNodes];
+    const links: { source: string; target: string }[] = maturityNodes.map((mn) => ({ source: "hub", target: mn.id }));
     // Chain links between maturity levels
     for (let i = 0; i < maturityNodes.length - 1; i++) {
       links.push({ source: maturityNodes[i].id, target: maturityNodes[i + 1].id });
     }
+    // Links from maturity nodes to their skill leaves
+    leafNodes.forEach((ln) => {
+      links.push({ source: ln.parentId!, target: ln.id });
+    });
 
     const defs = svg.append("defs");
     allNodes.forEach((node) => {
       const grad = defs.append("radialGradient").attr("id", `sfglow-${node.id}`).attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
-      grad.append("stop").attr("offset", "0%").attr("stop-color", node.color).attr("stop-opacity", 0.8);
-      grad.append("stop").attr("offset", "60%").attr("stop-color", node.color).attr("stop-opacity", 0.25);
+      grad.append("stop").attr("offset", "0%").attr("stop-color", node.color).attr("stop-opacity", node.isLeaf ? 0.6 : 0.8);
+      grad.append("stop").attr("offset", "60%").attr("stop-color", node.color).attr("stop-opacity", node.isLeaf ? 0.15 : 0.25);
       grad.append("stop").attr("offset", "100%").attr("stop-color", node.color).attr("stop-opacity", 0);
     });
     const filter = defs.append("filter").attr("id", "sf-glow-filter").attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
@@ -133,16 +167,33 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     const merge = filter.append("feMerge");
     merge.append("feMergeNode").attr("in", "blur");
     merge.append("feMergeNode").attr("in", "SourceGraphic");
+    // Smaller glow filter for leaf nodes
+    const leafFilter = defs.append("filter").attr("id", "sf-leaf-glow").attr("x", "-50%").attr("y", "-50%").attr("width", "200%").attr("height", "200%");
+    leafFilter.append("feGaussianBlur").attr("stdDeviation", "2").attr("result", "blur");
+    const leafMerge = leafFilter.append("feMerge");
+    leafMerge.append("feMergeNode").attr("in", "blur");
+    leafMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
     const container = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    const linkGroup = container.append("g").selectAll("line").data(links).enter().append("line")
-      .attr("stroke", "rgba(255,255,255,0.12)").attr("stroke-width", 2).attr("class", "edge-animated");
+    // ── Core nodes (hub + maturity) ──
+    const coreNodes = [hubNode, ...maturityNodes];
 
-    const glowGroup = container.append("g").selectAll("circle").data(allNodes).enter().append("circle")
+    const linkGroup = container.append("g").selectAll("line").data(links).enter().append("line")
+      .attr("stroke", (d) => {
+        const tgt = allNodes.find(n => n.id === (typeof d.target === "string" ? d.target : (d.target as any).id));
+        return tgt?.isLeaf ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.12)";
+      })
+      .attr("stroke-width", (d) => {
+        const tgt = allNodes.find(n => n.id === (typeof d.target === "string" ? d.target : (d.target as any).id));
+        return tgt?.isLeaf ? 1 : 2;
+      })
+      .attr("class", "edge-animated");
+
+    const glowGroup = container.append("g").selectAll("circle").data(coreNodes).enter().append("circle")
       .attr("r", (d) => d.radius * 2).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.5).style("pointer-events", "none");
 
-    const nodeGroup = container.append("g").selectAll("circle").data(allNodes).enter().append("circle")
+    const nodeGroup = container.append("g").selectAll("circle").data(coreNodes).enter().append("circle")
       .attr("r", (d) => d.radius).attr("fill", (d) => d.color).attr("opacity", 0.9)
       .attr("stroke", "rgba(255,255,255,0.2)").attr("stroke-width", 1.5).attr("filter", "url(#sf-glow-filter)")
       .attr("cursor", (d) => d.isHub ? "default" : "pointer")
@@ -163,8 +214,45 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
         }
       });
 
+    // ── Leaf skill nodes ──
+    const leafGlowGroup = container.append("g").selectAll("circle").data(leafNodes).enter().append("circle")
+      .attr("r", (d) => d.radius * 1.8).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.35).style("pointer-events", "none");
+
+    const leafNodeGroup = container.append("g").selectAll("circle").data(leafNodes).enter().append("circle")
+      .attr("r", (d) => d.radius).attr("fill", (d) => d.color).attr("opacity", 0.85)
+      .attr("stroke", (d) => d.color).attr("stroke-width", 1).attr("stroke-opacity", 0.4)
+      .attr("filter", "url(#sf-leaf-glow)").attr("cursor", "pointer")
+      .on("mouseover", function (event, d) {
+        d3.select(this).attr("opacity", 1).attr("stroke-width", 2.5).attr("stroke-opacity", 0.8);
+        const [x, y] = d3.pointer(event, svgRef.current);
+        setTooltip({ node: d, x, y });
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("opacity", 0.85).attr("stroke-width", 1).attr("stroke-opacity", 0.4);
+        setTooltip(null);
+      });
+
+    const leafLabelGroup = container.append("g").selectAll("text").data(leafNodes).enter().append("text")
+      .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 10)
+      .attr("fill", (d) => d.color).attr("font-size", "7px").attr("font-weight", "500")
+      .style("pointer-events", "none").attr("opacity", 0.8)
+      .text((d) => {
+        const name = d.greenSkillName || d.label;
+        return name.length > 18 ? name.slice(0, 16) + "…" : name;
+      });
+
+    // Severity initial inside leaf nodes
+    const leafInnerText = container.append("g").selectAll("text").data(leafNodes).enter().append("text")
+      .attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white")
+      .attr("font-size", "8px").attr("font-weight", "700").style("pointer-events", "none")
+      .text((d) => {
+        const sev = (d.severity || "").toLowerCase();
+        return sev === "critical" ? "!" : sev === "moderate" ? "~" : "✓";
+      });
+
+    // ── Core text layers ──
     // Level number inside node
-    const countText = container.append("g").selectAll("text").data(allNodes).enter().append("text")
+    const countText = container.append("g").selectAll("text").data(coreNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", d => d.isHub ? "-0.2em" : "0.35em").attr("fill", "white")
       .attr("font-size", (d) => d.isHub ? "12px" : "16px").attr("font-weight", "700").style("pointer-events", "none")
       .text((d) => d.isHub ? department.overall_score : (d.level || ""));
@@ -175,7 +263,7 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       .attr("font-size", "8px").style("pointer-events", "none").text("score");
 
     // Labels below nodes
-    const labelText = container.append("g").selectAll("text").data(allNodes).enter().append("text")
+    const labelText = container.append("g").selectAll("text").data(coreNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 16)
       .attr("fill", "rgba(255,255,255,0.85)").attr("font-size", (d) => d.isHub ? "13px" : "10px")
       .attr("font-weight", "600").style("pointer-events", "none")
@@ -198,16 +286,29 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
         return parts.slice(0, 2).join(" · ");
       });
 
+    // ── Force simulation ──
     const simulation = d3.forceSimulation<MaturityNode>(allNodes)
-      .force("link", d3.forceLink(links).id((d: any) => d.id).distance(160).strength(0.6))
-      .force("charge", d3.forceManyBody().strength(-400))
-      .force("center", d3.forceCenter(0, 0))
-      .force("collision", d3.forceCollide<MaturityNode>().radius((d) => d.radius + 30))
+      .force("link", d3.forceLink(links).id((d: any) => d.id)
+        .distance((d: any) => {
+          const tgt = typeof d.target === "object" ? d.target : allNodes.find(n => n.id === d.target);
+          return tgt?.isLeaf ? 70 : 160;
+        })
+        .strength((d: any) => {
+          const tgt = typeof d.target === "object" ? d.target : allNodes.find(n => n.id === d.target);
+          return tgt?.isLeaf ? 0.8 : 0.6;
+        }))
+      .force("charge", d3.forceManyBody<MaturityNode>().strength((d) => d.isLeaf ? -80 : -400))
+      .force("center", d3.forceCenter(0, 0).strength(0.05))
+      .force("collision", d3.forceCollide<MaturityNode>().radius((d) => d.isLeaf ? d.radius + 8 : d.radius + 30))
       .on("tick", () => {
         hubNode.x = 0; hubNode.y = 0;
         linkGroup.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y).attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
         glowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
         nodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        leafGlowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        leafNodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        leafLabelGroup.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        leafInnerText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
         countText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
         hubSub.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
         labelText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
@@ -288,22 +389,39 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
               className="absolute pointer-events-none z-50 bg-[#0f0f2e]/95 backdrop-blur-sm border border-white/10 rounded-lg px-4 py-3 shadow-xl"
               style={{ left: tooltip.x + 15, top: tooltip.y - 10, maxWidth: 320 }}>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: tooltip.node.color }}>
-                  {tooltip.node.level}
-                </div>
-                <span className="text-white font-semibold text-sm">{tooltip.node.label}</span>
-              </div>
-              <p className="text-[10px] text-white/50 mb-2">{tooltip.node.description}</p>
-              {tooltip.node.techSkill && (
-                <div className="space-y-0.5 text-[10px]">
-                  <div><span className="text-blue-400/60">Tech: </span><span className="text-white/60">{tooltip.node.techSkill}</span></div>
-                  <div><span className="text-purple-400/60">Knowledge: </span><span className="text-white/60">{tooltip.node.knowSkill}</span></div>
-                  <div><span className="text-amber-400/60">Value: </span><span className="text-white/60">{tooltip.node.valueSkill}</span></div>
-                  <div><span className="text-pink-400/60">Attitude: </span><span className="text-white/60">{tooltip.node.attitudeSkill}</span></div>
-                </div>
+              {tooltip.node.isLeaf ? (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tooltip.node.color }} />
+                    <span className="text-white font-semibold text-sm">{tooltip.node.greenSkillName || tooltip.node.label}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-[10px] mt-1">
+                    <span style={{ color: tooltip.node.color }} className="font-semibold capitalize">{tooltip.node.severity || "Unknown"}</span>
+                    <span className="text-white/40">Gap: {tooltip.node.gap ?? "—"}</span>
+                    <span className="text-white/40">Family: {tooltip.node.skillFamily}</span>
+                  </div>
+                  <div className="text-[10px] text-white/40 mt-1">Required level: {tooltip.node.level}</div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: tooltip.node.color }}>
+                      {tooltip.node.level}
+                    </div>
+                    <span className="text-white font-semibold text-sm">{tooltip.node.label}</span>
+                  </div>
+                  <p className="text-[10px] text-white/50 mb-2">{tooltip.node.description}</p>
+                  {tooltip.node.techSkill && (
+                    <div className="space-y-0.5 text-[10px]">
+                      <div><span className="text-blue-400/60">Tech: </span><span className="text-white/60">{tooltip.node.techSkill}</span></div>
+                      <div><span className="text-purple-400/60">Knowledge: </span><span className="text-white/60">{tooltip.node.knowSkill}</span></div>
+                      <div><span className="text-amber-400/60">Value: </span><span className="text-white/60">{tooltip.node.valueSkill}</span></div>
+                      <div><span className="text-pink-400/60">Attitude: </span><span className="text-white/60">{tooltip.node.attitudeSkill}</span></div>
+                    </div>
+                  )}
+                  <div className="text-[10px] text-white/25 mt-2">Click to expand maturity details →</div>
+                </>
               )}
-              <div className="text-[10px] text-white/25 mt-2">Click to expand maturity details →</div>
             </motion.div>
           )}
         </AnimatePresence>
