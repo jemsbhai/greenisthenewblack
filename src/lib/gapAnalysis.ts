@@ -227,3 +227,142 @@ export function getComplianceRiskSkills(skills: GreenSkill[]): GreenSkill[] {
       (theme.includes("risk") || theme.includes("compliance") || theme.includes("regulation") || theme.includes("climate"));
   });
 }
+
+// ─── Assessments ─────────────────────────────────────────────────
+export interface AssessmentQuestion {
+  theme: string;
+  question: string;
+  bestPractice: string;
+  developing: string;
+  emerging: string;
+  beginner: string;
+  linkedSkills: string;
+  score: number;
+}
+
+export function getDeptAssessments(deptLabel: string): AssessmentQuestion[] {
+  const keys = Object.keys(gsipData.assessments || {});
+  const key = matchDeptKey(deptLabel, keys);
+  if (!key) return [];
+  const raw = (gsipData.assessments as Record<string, Array<{
+    theme: string; question: string; best_practice: string;
+    developing: string; emerging: string; beginner: string;
+    linked_skills: string; score: number;
+  }>>)[key] || [];
+  return raw.map(q => ({
+    theme: q.theme,
+    question: q.question,
+    bestPractice: q.best_practice,
+    developing: q.developing,
+    emerging: q.emerging,
+    beginner: q.beginner,
+    linkedSkills: q.linked_skills,
+    score: q.score,
+  }));
+}
+
+// ─── Sector Intelligence ─────────────────────────────────────────
+export interface SectorIntel {
+  sector: string;
+  icon: string;
+  stats: string;
+  overview: string;
+  painPoints: string;
+  whyGreenSkillsMatter: string;
+  keyRoles: string;
+  prioritySkills: string;
+  quickWins: string;
+  regulatoryHorizon: string;
+  dataSource: string;
+}
+
+export function getAllSectors(): SectorIntel[] {
+  return (gsipData.sectors as Array<{
+    sector: string; icon: string; stats: string; overview: string;
+    pain_points: string; why_green_skills_matter: string; key_roles: string;
+    priority_skills: string; quick_wins: string; regulatory_horizon: string;
+    data_source: string;
+  }>).map(s => ({
+    sector: s.sector,
+    icon: s.icon,
+    stats: s.stats,
+    overview: s.overview,
+    painPoints: s.pain_points,
+    whyGreenSkillsMatter: s.why_green_skills_matter,
+    keyRoles: s.key_roles,
+    prioritySkills: s.priority_skills,
+    quickWins: s.quick_wins,
+    regulatoryHorizon: s.regulatory_horizon,
+    dataSource: s.data_source,
+  }));
+}
+
+// ─── Sector × Department Priority Matrix ─────────────────────────
+export function getDeptSectorPriorities(deptLabel: string): Record<string, string> {
+  const keys = Object.keys(gsipData.priority_matrix || {});
+  const key = matchDeptKey(deptLabel, keys);
+  if (!key) return {};
+  return (gsipData.priority_matrix as Record<string, Record<string, string>>)[key] || {};
+}
+
+// ─── Skills Map (from spreadsheet, with full descriptions) ───────
+export interface SkillMapEntry {
+  greenSkill: string;
+  skillFamily: string;
+  description: string;
+  whyItMatters: string;
+  exampleBehaviours: string;
+}
+
+export function getDeptSkillsMap(deptLabel: string): SkillMapEntry[] {
+  const keys = Object.keys(gsipData.skills_map || {});
+  const key = matchDeptKey(deptLabel, keys);
+  if (!key) return [];
+  return ((gsipData.skills_map as Record<string, Array<{
+    green_skill: string; skill_family: string; description: string;
+    why_it_matters: string; example_behaviours: string;
+  }>>)[key] || []).map(s => ({
+    greenSkill: s.green_skill,
+    skillFamily: s.skill_family,
+    description: s.description,
+    whyItMatters: s.why_it_matters,
+    exampleBehaviours: s.example_behaviours,
+  }));
+}
+
+// ─── Skills by Family (bullet points from spreadsheet) ───────────
+export function getDeptSkillsByFamily(deptLabel: string): Record<string, string> {
+  const keys = Object.keys(gsipData.skills_by_family || {});
+  const key = matchDeptKey(deptLabel, keys);
+  if (!key) return {};
+  return (gsipData.skills_by_family as Record<string, Record<string, string>>)[key] || {};
+}
+
+// ─── Actions for a specific department ───────────────────────────
+export interface ActionEntry {
+  skillFamily: string;
+  greenSkill: string;
+  action: string;
+  contribution: string;
+  targetMaturity: string;
+  linkedTheme: string;
+  priority: string;
+}
+
+export function getDeptActions(deptLabel: string): ActionEntry[] {
+  const keys = Object.keys(gsipData.actions || {});
+  const key = matchDeptKey(deptLabel, keys);
+  if (!key) return [];
+  return ((gsipData.actions as Record<string, Array<{
+    skill_family: string; green_skill: string; action: string;
+    contribution: string; target_maturity: string; linked_theme: string; priority: string;
+  }>>)[key] || []).map(a => ({
+    skillFamily: a.skill_family,
+    greenSkill: a.green_skill,
+    action: a.action,
+    contribution: a.contribution,
+    targetMaturity: a.target_maturity,
+    linkedTheme: a.linked_theme,
+    priority: a.priority,
+  }));
+}
