@@ -44,14 +44,13 @@ export default function MethodologyModal({ onClose }: MethodologyModalProps) {
 
         <div className="px-6 py-5 space-y-5 text-sm text-white/70">
           <section>
-            <h3 className="text-white font-semibold mb-2">
-              Green Skills Gap Analysis
-            </h3>
+            <h3 className="text-white font-semibold mb-2">Green Skills Intelligence Platform</h3>
             <p>
-              GreenPulse maps the sustainability skills landscape across your
-              organisation. Each department is assessed across{" "}
-              <strong className="text-white/90">12 green skills</strong> grouped
-              into 4 families: Technical, Knowledgeable, Values, and Attitudes.
+              GreenPulse maps <strong className="text-white/90">120+ green skills</strong> across{" "}
+              <strong className="text-white/90">10 departments</strong>, specifically mapped to
+              compliance and regulation per department, theme, and maturity levels.
+              Each department is assessed across 12 green skills grouped into 4 families:
+              Technical, Knowledgeable, Values, and Attitudes.
             </p>
           </section>
 
@@ -65,62 +64,85 @@ export default function MethodologyModal({ onClose }: MethodologyModalProps) {
             <div className="mt-2 space-y-1">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                <span>
-                  <strong className="text-red-400">Critical:</strong> Gap ≥ 2
-                </span>
+                <span><strong className="text-red-400">Critical:</strong> Gap ≥ 2 — Immediate upskilling required</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span>
-                  <strong className="text-amber-400">Moderate:</strong> Gap = 1
-                </span>
+                <span><strong className="text-amber-400">Moderate:</strong> Gap = 1 — Development focus needed</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                <span>
-                  <strong className="text-green-400">No Gap:</strong> Gap = 0
-                </span>
+                <span><strong className="text-green-400">No Gap:</strong> Gap = 0 — Meets or exceeds target</span>
               </div>
             </div>
           </section>
 
           <section>
-            <h3 className="text-white font-semibold mb-2">
-              16 Optimization Factors
-            </h3>
+            <h3 className="text-white font-semibold mb-2">Risk Scoring</h3>
             <p>
-              Each skill is scored (0.00–1.00) across 16 operational
-              sustainability factors — from carbon footprint to material waste.
-              These scores indicate{" "}
-              <strong className="text-white/90">
-                how much each skill impacts real operational sustainability
-              </strong>
-              .
+              Each skill receives a <strong className="text-white/90">weighted risk score</strong> combining:
             </p>
-            <p className="mt-2">
-              A higher score means the skill has more influence on that factor.
-              The average across all 16 factors determines the node&apos;s glow
-              color on the network.
+            <ul className="mt-1 space-y-1 ml-4 list-disc text-white/60">
+              <li><strong className="text-white/80">Gap severity</strong> (40%) — How far below the required level</li>
+              <li><strong className="text-white/80">Sustainability impact</strong> (35%) — Average across 16 optimisation factors</li>
+              <li><strong className="text-white/80">Priority level</strong> (25%) — Strategic urgency from the organisation</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-2">4-Level Maturity Framework</h3>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/50 flex-shrink-0">1</div>
+                <div><strong className="text-white/80">Curious Explorer</strong> — Basic awareness of sustainability terms and impact</div>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/50 flex-shrink-0">2</div>
+                <div><strong className="text-white/80">Engaged Learner</strong> — Applies basic sustainability principles</div>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/50 flex-shrink-0">3</div>
+                <div><strong className="text-white/80">Active Contributor</strong> — Integrates sustainability into daily processes</div>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-white/50 flex-shrink-0">4</div>
+                <div><strong className="text-white/80">Conscious Changemaker</strong> — Drives organisational transformation</div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-2">Green Skills Directory</h3>
+            <p>
+              Click any department node to access the <strong className="text-white/90">Green Skills Directory</strong> — a
+              complete catalogue of all 12 skills for that department with descriptions,
+              themes, maturity progressions, severity, and priority levels.
             </p>
           </section>
 
           <section>
-            <h3 className="text-white font-semibold mb-2">Network Visualization</h3>
+            <h3 className="text-white font-semibold mb-2">Priority Actions & Learning Pathways</h3>
             <p>
-              The neural network layout shows departments as interconnected
-              nodes. Edge thickness reflects interdepartmental relationship
-              strength. Drill into any department to explore skill families,
-              then individual skills with their full optimization radar profile.
+              For each team, GreenPulse maps <strong className="text-white/90">mindset, maturity,
+              vital green skills gaps, risks & rewards, and suggested learning pathways</strong>.
+              The Priority Actions tab ranks skills by risk score and provides specific actions
+              and step-by-step development pathways.
             </p>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-2">5 Green Themes</h3>
+            <div className="grid grid-cols-2 gap-1 text-xs">
+              <div className="px-2 py-1 rounded bg-white/5 text-white/60">Climate Fluency</div>
+              <div className="px-2 py-1 rounded bg-white/5 text-white/60">Decarbonisation</div>
+              <div className="px-2 py-1 rounded bg-white/5 text-white/60">Data & AI Maturity</div>
+              <div className="px-2 py-1 rounded bg-white/5 text-white/60">Risk</div>
+              <div className="px-2 py-1 rounded bg-white/5 text-white/60">Circular Practices</div>
+            </div>
           </section>
 
           <section>
             <h3 className="text-white font-semibold mb-2">Node Color Legend</h3>
-            <p className="mb-2">
-              Department node colors are driven by <strong className="text-white/90">gap severity</strong>{" "}
-              calculated from the distribution of critical, moderate, and no-gap
-              skills within each department.
-            </p>
             <div className="flex gap-4 mt-1">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-500 shadow shadow-red-500/50" />
@@ -140,11 +162,8 @@ export default function MethodologyModal({ onClose }: MethodologyModalProps) {
           <section>
             <h3 className="text-white font-semibold mb-2">CSV Export</h3>
             <p>
-              Export a complete gap analysis report including all department
-              summaries, skill-level data, severity classifications, and 16
-              optimization factor scores. Use the{" "}
-              <strong className="text-white/90">Export CSV</strong> button in the
-              sidebar.
+              Export a complete gap analysis report including department summaries, risk scores,
+              maturity levels, all skill-level data, and 16 optimisation factor scores.
             </p>
           </section>
         </div>

@@ -1,0 +1,1665 @@
+{
+  "overview": {
+    "Procurement": {
+      "definition": "Manages sourcing, supplier relationships, and purchasing decisions across the organisation.",
+      "green_skills_focus": "Embedding decarbonisation, circular procurement, and ESG supplier performance management.",
+      "example_green_jobs": "Sustainable Procurement Manager, Scope 3 Data Analyst, Circular Supply Chain Lead.",
+      "risk_of_not_upskilling": "Regulatory non-compliance, supply chain disruption, reputational damage, missed cost-saving opportunities."
+    },
+    "Finance": {
+      "definition": "Oversees budgeting, financial planning, reporting, investment decisions, and risk management.",
+      "green_skills_focus": "Integrating ESG risk assessment, sustainable finance, and climate disclosure capabilities.",
+      "example_green_jobs": "Green Finance Analyst, ESG Reporting Lead, Climate Risk Officer.",
+      "risk_of_not_upskilling": "Investor disengagement, regulatory penalties, stranded assets, reduced access to capital."
+    },
+    "Marketing": {
+      "definition": "Develops and delivers brand, product, and customer communications.",
+      "green_skills_focus": "Green claims compliance, sustainability storytelling, behaviour change communications.",
+      "example_green_jobs": "Sustainability Communications Manager, Purpose-Led Brand Strategist, ESG Content Creator.",
+      "risk_of_not_upskilling": "Greenwashing claims, reputational damage, loss of customer trust, regulatory fines."
+    },
+    "IT": {
+      "definition": "Provides technology infrastructure, systems, and data management across the business.",
+      "green_skills_focus": "Green IT practices, ESG data management, AI for sustainability optimisation.",
+      "example_green_jobs": "Sustainable IT Architect, ESG Data Platform Manager, AI Sustainability Lead.",
+      "risk_of_not_upskilling": "Increased digital emissions, data integrity risks, inability to meet disclosure requirements."
+    },
+    "Legal": {
+      "definition": "Manages legal risk, compliance, contracts, and governance.",
+      "green_skills_focus": "ESG disclosure compliance, green claims defence, climate risk governance.",
+      "example_green_jobs": "ESG Compliance Counsel, Climate Risk Legal Advisor, Sustainable Policy Lead.",
+      "risk_of_not_upskilling": "Litigation exposure, non-compliance fines, reputational harm, board-level liability."
+    },
+    "Supply Chain": {
+      "definition": "Plans, manages, and optimises the flow of goods, services, and materials.",
+      "green_skills_focus": "Circular logistics, Scope 3 emissions management, climate resilience planning.",
+      "example_green_jobs": "Circular Supply Chain Manager, Net Zero Logistics Lead, Climate Resilience Planner.",
+      "risk_of_not_upskilling": "Supply disruptions, regulatory non-compliance, higher costs, reputational damage."
+    },
+    "HR": {
+      "definition": "Supports recruitment, talent development, culture, and organisational effectiveness.",
+      "green_skills_focus": "Green skills training design, sustainability culture building, inclusion in ESG strategies.",
+      "example_green_jobs": "Green Skills Development Partner, Sustainability Culture Manager, ESG Capability Lead.",
+      "risk_of_not_upskilling": "Workforce disengagement, talent shortages, failure to embed sustainability culture."
+    },
+    "CxO / Executive": {
+      "definition": "Sets strategic direction, governance, and resource allocation for the organisation.",
+      "green_skills_focus": "Climate governance, ESG strategy integration, stakeholder transparency.",
+      "example_green_jobs": "Chief Sustainability Officer, ESG Board Advisor, Net Zero Transformation Leader.",
+      "risk_of_not_upskilling": "Strategic failure, loss of investor confidence, regulatory non-compliance, reputational damage."
+    },
+    "Operations": {
+      "definition": "Delivers core production and service processes to meet customer and business needs.",
+      "green_skills_focus": "Low-carbon process design, circular operations, climate risk management.",
+      "example_green_jobs": "Sustainable Operations Manager, Net Zero Process Designer, Circular Economy Operations Lead.",
+      "risk_of_not_upskilling": "Inefficiencies, rising costs, non-compliance, failure to meet decarbonisation targets."
+    },
+    "R&D": {
+      "definition": "Innovates products, services, and solutions to drive growth and differentiation.",
+      "green_skills_focus": "Sustainable design thinking, lifecycle assessment, regenerative innovation practices.",
+      "example_green_jobs": "Circular Product Designer, Regenerative Innovation Lead, Net Positive R&D Manager.",
+      "risk_of_not_upskilling": "Product obsolescence, loss of market share, regulatory penalties, stranded assets."
+    }
+  },
+  "maturity_map": {
+    "Procurement": [
+      {
+        "level": "Curious Explorer",
+        "description": "Has basic awareness of sustainability terms and understands that procurement decisions affect environmental and social outcomes.",
+        "technical_skill": "Sustainable Sourcing",
+        "knowledge_skill": "Supplier Emissions Data",
+        "value": "Ethical Purchasing",
+        "attitude": "Proactive Engagement"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Can identify suppliers and categories with sustainability impacts and applies some low-carbon or ethical sourcing considerations.",
+        "technical_skill": "Life Cycle Analysis",
+        "knowledge_skill": "Circular Procurement",
+        "value": "Transparency Focus",
+        "attitude": "Continuous Improvement"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Consistently integrates sustainability criteria into sourcing, contracts, and supplier relationships.",
+        "technical_skill": "Low-Carbon Contracting",
+        "knowledge_skill": "Scope 3 Reporting",
+        "value": "Responsibility Mindset",
+        "attitude": "Collaboration Driven"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Leads strategic supplier collaboration, champions circular procurement, and drives innovation in sustainable value chains.",
+        "technical_skill": "Supplier Innovation",
+        "knowledge_skill": "Climate Standards Mastery",
+        "value": "Purpose-Led Leadership",
+        "attitude": "Ecosystem Influence"
+      }
+    ],
+    "Finance": [
+      {
+        "level": "Curious Explorer",
+        "description": "Understands core ESG concepts and recognises that financial decisions influence climate and sustainability outcomes.",
+        "technical_skill": "ESG Risk Modelling",
+        "knowledge_skill": "Green Finance Principles",
+        "value": "Stewardship Commitment",
+        "attitude": "Long-Term Thinking"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Applies basic sustainability principles in budgeting, reporting, and investment reviews.",
+        "technical_skill": "Carbon Costing",
+        "knowledge_skill": "Regulatory Compliance",
+        "value": "Integrity Orientation",
+        "attitude": "Accountability Culture"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Integrates ESG risks, disclosures, and decarbonisation considerations into financial strategies and governance.",
+        "technical_skill": "Impact Investing",
+        "knowledge_skill": "TCFD Knowledge",
+        "value": "Purpose Driven",
+        "attitude": "Results Focused"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Drives enterprise-wide sustainable finance, stewards resources for transformation, and champions transparency with investors.",
+        "technical_skill": "Sustainable Capital",
+        "knowledge_skill": "Climate Disclosure Mastery",
+        "value": "Ethical Stewardship",
+        "attitude": "Systemic Perspective"
+      }
+    ],
+    "Marketing": [
+      {
+        "level": "Curious Explorer",
+        "description": "Recognises customer interest in sustainability and basic risks of inaccurate environmental claims.",
+        "technical_skill": "Green Claims Review",
+        "knowledge_skill": "Sustainability Storytelling",
+        "value": "Authentic Messaging",
+        "attitude": "Customer Centricity"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Creates messaging that reflects credible commitments and supports brand trust.",
+        "technical_skill": "Low-Impact Campaigns",
+        "knowledge_skill": "Behavioural Insights",
+        "value": "Honesty in Claims",
+        "attitude": "Openness to Feedback"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Embeds sustainability narratives into campaigns and champions responsible marketing practices.",
+        "technical_skill": "Eco-Labelling Compliance",
+        "knowledge_skill": "Circular Promotion",
+        "value": "Social Responsibility",
+        "attitude": "Learning Orientation"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Shapes brand strategy around sustainability leadership and drives innovation in purpose-led communications.",
+        "technical_skill": "Purpose-Driven Branding",
+        "knowledge_skill": "Climate Communications Mastery",
+        "value": "Brand Integrity Champion",
+        "attitude": "Influence Orientation"
+      }
+    ],
+    "IT": [
+      {
+        "level": "Curious Explorer",
+        "description": "Understands how IT contributes to emissions and recognises the role of data in sustainability.",
+        "technical_skill": "Green Software Design",
+        "knowledge_skill": "ESG Data Management",
+        "value": "Digital Responsibility",
+        "attitude": "Digital Responsibility"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Tracks digital footprint and supports ESG data collection and reporting.",
+        "technical_skill": "Cloud Efficiency",
+        "knowledge_skill": "AI Ethics Knowledge",
+        "value": "Transparency Culture",
+        "attitude": "Transparency Culture"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Leads initiatives to improve energy efficiency, data governance, and digital sustainability practices.",
+        "technical_skill": "Data Footprint Reduction",
+        "knowledge_skill": "Cyber-ESG Risk",
+        "value": "Privacy Respect",
+        "attitude": "Privacy Respect"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Develops transformative IT strategies that enable enterprise decarbonisation and transparency.",
+        "technical_skill": "AI-Optimised Sustainability",
+        "knowledge_skill": "ESG Data Governance",
+        "value": "Digital Stewardship",
+        "attitude": "Digital Stewardship"
+      }
+    ],
+    "Legal": [
+      {
+        "level": "Curious Explorer",
+        "description": "Understands foundational sustainability regulations and the legal implications of non-compliance.",
+        "technical_skill": "ESG Contract Clauses",
+        "knowledge_skill": "Environmental Regulations",
+        "value": "Fairness Focus",
+        "attitude": "Integrity Driven"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Reviews contracts and disclosures for ESG risks and compliance requirements.",
+        "technical_skill": "Greenwashing Defense",
+        "knowledge_skill": "Climate Disclosure Rules",
+        "value": "Compliance Ethos",
+        "attitude": "Risk Awareness"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Proactively manages sustainability-related risks and advises on policy and governance frameworks.",
+        "technical_skill": "Circular Policy Drafting",
+        "knowledge_skill": "Due Diligence Law",
+        "value": "Justice Orientation",
+        "attitude": "Critical Analysis"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Shapes strategic ESG legal guidance, anticipates regulatory trends, and leads on ethical governance.",
+        "technical_skill": "Strategic ESG Counsel",
+        "knowledge_skill": "Regulatory Innovation",
+        "value": "Ethical Leadership",
+        "attitude": "Policy Advocacy"
+      }
+    ],
+    "Supply Chain": [
+      {
+        "level": "Curious Explorer",
+        "description": "Recognises climate and circularity issues across the supply chain and their operational impacts.",
+        "technical_skill": "Carbon Hotspot Mapping",
+        "knowledge_skill": "Circular Logistics",
+        "value": "Responsible Sourcing",
+        "attitude": "Resilience Focus"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Applies sustainability criteria to sourcing decisions and tracks supply chain performance.",
+        "technical_skill": "Low-Emission Transport",
+        "knowledge_skill": "Scope 3 Visibility",
+        "value": "Resource Stewardship",
+        "attitude": "Partnership Mindset"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Leads decarbonisation and resilience initiatives with suppliers.",
+        "technical_skill": "Circular Inventory",
+        "knowledge_skill": "Climate Risk Planning",
+        "value": "Fair Trade Values",
+        "attitude": "Systems Thinking"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Designs regenerative, circular supply chains and drives collaborative transformation.",
+        "technical_skill": "Net Zero Logistics",
+        "knowledge_skill": "Supply Chain Transparency",
+        "value": "Ethical Trade Advocacy",
+        "attitude": "Ecosystem Collaboration"
+      }
+    ],
+    "HR": [
+      {
+        "level": "Curious Explorer",
+        "description": "Understands sustainability basics and the HR role in building awareness and culture.",
+        "technical_skill": "Green Workforce Planning",
+        "knowledge_skill": "Green Upskilling Knowledge",
+        "value": "Inclusion Commitment",
+        "attitude": "Culture Building"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Embeds sustainability considerations in training, engagement, and workforce policies.",
+        "technical_skill": "Sustainable Benefits",
+        "knowledge_skill": "Climate Policy Awareness",
+        "value": "Purpose Driven",
+        "attitude": "Empathy Orientation"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Leads programmes to build green skills and align HR strategy with organisational sustainability goals.",
+        "technical_skill": "Net Zero Onboarding",
+        "knowledge_skill": "Diversity Integration",
+        "value": "Health & Wellbeing Focus",
+        "attitude": "Open Communication"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Champions purpose-driven culture, capability transformation, and sustainable workforce practices.",
+        "technical_skill": "Workforce Transformation",
+        "knowledge_skill": "Capability Roadmapping",
+        "value": "Inclusive Leadership",
+        "attitude": "Change Enablement"
+      }
+    ],
+    "CxO": [
+      {
+        "level": "Curious Explorer",
+        "description": "Recognises sustainability as a strategic priority and understands basic regulatory and stakeholder expectations.",
+        "technical_skill": "ESG Strategy Design",
+        "knowledge_skill": "Climate Governance",
+        "value": "Visionary Leadership",
+        "attitude": "Bold Commitment"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Integrates climate and ESG considerations into leadership decisions and communications.",
+        "technical_skill": "Decarbonisation Roadmapping",
+        "knowledge_skill": "Regulatory Mastery",
+        "value": "Stewardship Values",
+        "attitude": "Accountability Driven"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Drives resource allocation, policy setting, and accountability for sustainability performance.",
+        "technical_skill": "Sustainable Investment",
+        "knowledge_skill": "TCFD Familiarity",
+        "value": "Systemic Responsibility",
+        "attitude": "Adaptive Mindset"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Champions transformative strategies and industry leadership in sustainability and net zero.",
+        "technical_skill": "Climate Impact Leadership",
+        "knowledge_skill": "Enterprise Transformation",
+        "value": "Purpose-Driven Culture",
+        "attitude": "Strategic Advocacy"
+      }
+    ],
+    "Operations": [
+      {
+        "level": "Curious Explorer",
+        "description": "Understands how operational activities impact emissions, waste, and resource use.",
+        "technical_skill": "Energy Efficiency",
+        "knowledge_skill": "Process Footprinting",
+        "value": "Operational Integrity",
+        "attitude": "Improvement Focus"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Applies sustainability practices in day-to-day operations and tracks improvements.",
+        "technical_skill": "Circular Process Design",
+        "knowledge_skill": "Emissions Tracking",
+        "value": "Resource Responsibility",
+        "attitude": "Ownership Culture"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Leads projects to decarbonise processes and embed circular practices in operations.",
+        "technical_skill": "Waste Reduction",
+        "knowledge_skill": "ESG Compliance",
+        "value": "Transparency Ethos",
+        "attitude": "Results Orientation"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Designs and implements operational strategies aligned to regenerative and net zero principles.",
+        "technical_skill": "Regenerative Operations",
+        "knowledge_skill": "Zero Waste Strategy",
+        "value": "Sustainability Advocacy",
+        "attitude": "Performance Culture"
+      }
+    ],
+    "R&D": [
+      {
+        "level": "Curious Explorer",
+        "description": "Recognises the impact of product and process design on sustainability outcomes.",
+        "technical_skill": "Sustainable Design",
+        "knowledge_skill": "Circular Innovation",
+        "value": "Regenerative Thinking",
+        "attitude": "Curiosity Driven"
+      },
+      {
+        "level": "Engaged Learner",
+        "description": "Integrates basic low-carbon and circular principles into development projects.",
+        "technical_skill": "Low-Carbon Prototyping",
+        "knowledge_skill": "Alternative Material Knowledge",
+        "value": "Future Orientation",
+        "attitude": "Challenge Acceptance"
+      },
+      {
+        "level": "Active Contributor",
+        "description": "Leads sustainable innovation initiatives and life cycle assessments.",
+        "technical_skill": "Lifecycle Impact",
+        "knowledge_skill": "Climate Solutions",
+        "value": "Impact Awareness",
+        "attitude": "Experimentation Focus"
+      },
+      {
+        "level": "Conscious Changemaker",
+        "description": "Champions breakthrough regenerative solutions and positions sustainability at the core of R&D strategy.",
+        "technical_skill": "Net Positive Innovation",
+        "knowledge_skill": "Transformational R&D",
+        "value": "Purpose-Driven Creation",
+        "attitude": "Innovation Leadership"
+      }
+    ]
+  },
+  "actions": {
+    "Procurement": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Sustainable Sourcing",
+        "action": "Including sustainability criteria in RFPs, preferring suppliers with certifications, evaluating total life cycle impact.",
+        "contribution": "Drives emissions reductions, supports ethical practices, and strengthens resilience in the value chain.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Life Cycle Analysis",
+        "action": "Conducting cradle-to-grave assessments, comparing material options, integrating LCA results into procurement criteria.",
+        "contribution": "Enables informed decision-making and transparent reporting on product footprint.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Low-Carbon Contracting",
+        "action": "Including carbon KPIs in contracts, requiring regular emissions reporting, enforcing consequences for non-compliance.",
+        "contribution": "Aligns suppliers to decarbonisation commitments and ensures accountability.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Supplier Emissions Data",
+        "action": "Requesting supplier emissions data, verifying against standards, supporting suppliers to improve data quality.",
+        "contribution": "Provides a foundation for accurate carbon accounting and progress tracking.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Circular Procurement",
+        "action": "Including circularity requirements in tenders, preferring remanufactured products, tracking circular performance metrics.",
+        "contribution": "Reduces waste and resource consumption, supports circular economy goals.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Scope 3 Reporting",
+        "action": "Preparing supplier GHG inventories, consolidating data for reports, explaining Scope 3 contributions to stakeholders.",
+        "contribution": "Supports transparency and regulatory compliance under frameworks like CSRD.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Ethical Purchasing",
+        "action": "Selecting fair trade suppliers, avoiding products linked to deforestation or exploitation, prioritising local sourcing where possible.",
+        "contribution": "Builds trust with stakeholders and protects reputation.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Transparency Focus",
+        "action": "Publishing sourcing policies, providing feedback to suppliers, reporting progress externally.",
+        "contribution": "Fosters accountability and strengthens supplier relationships.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Responsibility Mindset",
+        "action": "Developing action plans for high-impact categories, training teams, engaging in supplier development programs.",
+        "contribution": "Encourages proactive improvements rather than compliance-only approaches.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Proactive Engagement",
+        "action": "Engaging suppliers early on expectations, piloting improvements, sharing forecasts for demand planning.",
+        "contribution": "Reduces disruptions, speeds progress, and demonstrates leadership.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Continuous Improvement",
+        "action": "Conducting periodic reviews, benchmarking against peers, updating policies based on lessons learned.",
+        "contribution": "Ensures progress keeps pace with expectations and innovation.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Collaboration Driven",
+        "action": "Joining industry coalitions, co-creating solutions with suppliers, sharing best practices and resources.",
+        "contribution": "Helps address systemic issues and improves outcomes that no organisation can tackle alone.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "Finance": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "ESG Risk Modelling",
+        "action": "Building scenario models, quantifying exposure to carbon pricing, stress-testing assets against climate scenarios.",
+        "contribution": "Supports resilience and informed decision-making on investments and allocations.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Carbon Costing",
+        "action": "Including carbon costs in ROI calculations, advising on emissions reduction paybacks, presenting alternative scenarios with carbon pricing.",
+        "contribution": "Encourages low-carbon decisions and transparency in financial analysis.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Impact Investing",
+        "action": "Screening investments for ESG criteria, developing green finance products, monitoring impact KPIs.",
+        "contribution": "Positions the business for sustainable growth and stakeholder confidence.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Green Finance Principles",
+        "action": "Staying updated on regulations, advising teams on eligibility, integrating principles into investment strategies.",
+        "contribution": "Ensures compliance and alignment with evolving expectations.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Regulatory Compliance",
+        "action": "Preparing climate disclosures, coordinating data collection, validating accuracy with auditors.",
+        "contribution": "Avoids legal risk and strengthens investor confidence.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "TCFD Knowledge",
+        "action": "Producing scenario analysis, supporting board reporting, aligning with investor expectations.",
+        "contribution": "Demonstrates transparency and readiness for regulatory scrutiny.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Stewardship Commitment",
+        "action": "Prioritising long-term value creation, questioning short-term trade-offs, advocating responsible investment decisions.",
+        "contribution": "Reinforces trust with stakeholders and underpins sustainable performance.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Integrity Orientation",
+        "action": "Double-checking ESG data, challenging incomplete narratives, ensuring clarity in sustainability messaging.",
+        "contribution": "Protects reputation and ensures compliance with regulations.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Purpose Driven",
+        "action": "Embedding ESG metrics into KPIs, proposing investments that align with purpose, celebrating impact achievements.",
+        "contribution": "Enhances engagement and positions finance as a strategic partner.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Long-Term Thinking",
+        "action": "Reviewing scenarios over 10\u201330 years, questioning short-term savings that conflict with sustainability, balancing financial and environmental outcomes.",
+        "contribution": "Future-proofs the business and builds resilience.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Accountability Culture",
+        "action": "Regularly reporting progress, engaging peers in shared accountability, driving performance improvements.",
+        "contribution": "Encourages proactive problem solving and transparency.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Results Focused",
+        "action": "Tracking progress against KPIs, addressing gaps quickly, celebrating successes publicly.",
+        "contribution": "Builds credibility with investors and stakeholders.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "Marketing": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Green Claims Review",
+        "action": "Verifying claims against evidence, consulting legal teams, updating messaging as needed.",
+        "contribution": "Protects brand trust and ensures compliance with regulations.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Low-Impact Campaigns",
+        "action": "Selecting low-carbon media, using digital channels, measuring campaign footprint.",
+        "contribution": "Demonstrates authenticity and supports decarbonisation targets.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Eco-Labelling Compliance",
+        "action": "Confirming certification requirements, training teams, maintaining approvals documentation.",
+        "contribution": "Avoids misleading customers and meets legal obligations.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Sustainability Storytelling",
+        "action": "Developing case studies, producing videos, aligning messaging to strategy.",
+        "contribution": "Builds credibility and inspires customers to engage.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Behavioural Insights",
+        "action": "Designing calls to action, testing messages, analysing impact data.",
+        "contribution": "Supports decarbonisation and circularity goals through demand shifts.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Circular Promotion",
+        "action": "Campaigning on reuse schemes, co-creating content with customers, celebrating impact stories.",
+        "contribution": "Helps grow participation in circular models and drives differentiation.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Authentic Messaging",
+        "action": "Reviewing materials carefully, removing exaggerated language, providing clear sourcing information.",
+        "contribution": "Protects reputation and avoids regulatory penalties.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Honesty in Claims",
+        "action": "Publishing supporting data, addressing trade-offs, using neutral language.",
+        "contribution": "Builds trust and manages expectations.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Social Responsibility",
+        "action": "Avoiding stereotypes, promoting inclusivity, choosing sustainable partners.",
+        "contribution": "Strengthens purpose-led brand identity and stakeholder loyalty.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Customer Centricity",
+        "action": "Conducting research, adjusting messaging, responding to feedback.",
+        "contribution": "Improves relevance and engagement.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Openness to Feedback",
+        "action": "Running post-campaign reviews, tracking sentiment, acting on feedback.",
+        "contribution": "Drives learning and continuous improvement.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Learning Orientation",
+        "action": "Subscribing to updates, attending webinars, sharing insights internally.",
+        "contribution": "Keeps marketing relevant and legally compliant.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "IT": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Green Software Design",
+        "action": "Optimising code, reducing data storage needs, selecting efficient platforms.",
+        "contribution": "Lowers digital footprint and operational costs.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Cloud Efficiency",
+        "action": "Rightsizing instances, auto-scaling workloads, selecting low-carbon data centres.",
+        "contribution": "Supports decarbonisation and cost management.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Data Footprint Reduction",
+        "action": "Implementing data lifecycle policies, automating deletion, reporting results.",
+        "contribution": "Reduces environmental impact and boosts performance.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "ESG Data Management",
+        "action": "Building data pipelines, ensuring data quality, maintaining secure access controls.",
+        "contribution": "Enables accurate reporting and transparency.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "AI Ethics Knowledge",
+        "action": "Reviewing algorithms, training teams, embedding ethical considerations.",
+        "contribution": "Reduces risks of bias, privacy breaches, and misuse.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Cyber-ESG Risk",
+        "action": "Implementing controls, auditing systems, managing incidents effectively.",
+        "contribution": "Maintains trust and compliance.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Digital Responsibility",
+        "action": "Selecting responsible vendors, questioning unnecessary growth, prioritising privacy.",
+        "contribution": "Builds long-term trust and resilience.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Transparency Culture",
+        "action": "Publishing dashboards, reporting progress, explaining methodologies.",
+        "contribution": "Fosters accountability and engagement.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Privacy Respect",
+        "action": "Anonymising data, obtaining consents, adhering to regulations.",
+        "contribution": "Meets legal requirements and earns user trust.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Innovation Mindset",
+        "action": "Piloting tools, testing prototypes, scaling successes.",
+        "contribution": "Accelerates progress and competitiveness.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Problem Solving",
+        "action": "Investigating inefficiencies, proposing solutions, collaborating cross-functionally.",
+        "contribution": "Reduces delays and enhances effectiveness.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Adaptive Thinking",
+        "action": "Updating roadmaps, reallocating resources, revising targets.",
+        "contribution": "Keeps IT responsive to evolving needs and regulations.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "Legal": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "ESG Contract Clauses",
+        "action": "Including carbon targets, requiring supplier disclosures, defining audit rights.",
+        "contribution": "Ensures commitments are enforceable and clear.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Greenwashing Defense",
+        "action": "Reviewing campaigns, checking substantiation, advising on disclaimers.",
+        "contribution": "Reduces reputational and regulatory risks.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Circular Policy Drafting",
+        "action": "Developing procurement policies, updating supplier codes, advising business units.",
+        "contribution": "Embeds sustainability into legal frameworks.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Environmental Regulations",
+        "action": "Tracking regulations, briefing teams, updating policies.",
+        "contribution": "Ensures proactive compliance and readiness.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Climate Disclosure Rules",
+        "action": "Reviewing reports, advising boards, ensuring consistency.",
+        "contribution": "Supports transparency and reduces litigation risk.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Due Diligence Law",
+        "action": "Conducting ESG due diligence, flagging risks, advising on warranties.",
+        "contribution": "Avoids inheriting liabilities and protects value.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Fairness Focus",
+        "action": "Considering community impacts, balancing interests, advising on ethics.",
+        "contribution": "Reinforces trust with stakeholders.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Compliance Ethos",
+        "action": "Refusing shortcuts, challenging non-compliance, documenting decisions.",
+        "contribution": "Protects the organisation and maintains credibility.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Justice Orientation",
+        "action": "Advising on inclusive policies, reviewing language, championing access to remedies.",
+        "contribution": "Builds stakeholder confidence and reduces risk of discrimination.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Integrity Driven",
+        "action": "Disclosing conflicts, admitting errors, advocating transparent decisions.",
+        "contribution": "Protects reputation and sets the tone for the organisation.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Risk Awareness",
+        "action": "Monitoring developments, flagging early warnings, updating risk registers.",
+        "contribution": "Enables proactive responses to new threats.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Critical Analysis",
+        "action": "Testing scenarios, consulting experts, playing devil\u2019s advocate.",
+        "contribution": "Ensures defensible and robust outcomes.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "Supply Chain": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Carbon Hotspot Mapping",
+        "action": "Mapping emissions by tier, ranking suppliers, updating priority lists.",
+        "contribution": "Targets improvement efforts where they matter most.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Low-Emission Transport",
+        "action": "Selecting electric fleets, optimising routes, consolidating shipments.",
+        "contribution": "Lowers Scope 3 emissions and costs.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Circular Inventory",
+        "action": "Implementing take-back programs, designing for disassembly, managing stock for reuse.",
+        "contribution": "Supports circular economy commitments and cost savings.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Circular Logistics",
+        "action": "Learning best practices, sharing case studies, training teams.",
+        "contribution": "Enables effective circular supply chains.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Scope 3 Visibility",
+        "action": "Using tools to collect data, verifying accuracy, preparing reports.",
+        "contribution": "Supports transparency and compliance with reporting standards.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Climate Risk Planning",
+        "action": "Conducting risk assessments, modelling scenarios, updating contingency plans.",
+        "contribution": "Builds resilience and protects continuity.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Responsible Sourcing",
+        "action": "Using supplier codes, auditing compliance, rewarding leaders.",
+        "contribution": "Improves resilience and protects brand reputation.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Resource Stewardship",
+        "action": "Monitoring waste, optimising packaging, designing efficient processes.",
+        "contribution": "Reduces costs and environmental footprint.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Fair Trade Values",
+        "action": "Selecting certified suppliers, communicating expectations, monitoring labour practices.",
+        "contribution": "Reinforces social responsibility and compliance.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Resilience Focus",
+        "action": "Reviewing contingency plans, training teams, building redundancy.",
+        "contribution": "Maintains performance under pressure.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Partnership Mindset",
+        "action": "Joining collaborations, co-developing solutions, sharing best practices.",
+        "contribution": "Leverages collective knowledge and influence.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Systems Thinking",
+        "action": "Mapping value chain impacts, identifying leverage points, communicating across functions.",
+        "contribution": "Leads to better-informed, more strategic decisions.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "HR": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Green Workforce Planning",
+        "action": "Workforce mapping, future skills analysis, succession planning.",
+        "contribution": "Ensures the business has the right capabilities for the transition.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Sustainable Benefits",
+        "action": "Subsidising public transport, offering green pensions, creating wellbeing programs.",
+        "contribution": "Reinforces commitment and engages employees.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Net Zero Onboarding",
+        "action": "Including ESG modules, assigning champions, sharing resources.",
+        "contribution": "Builds early engagement and alignment.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "ESG Training Knowledge",
+        "action": "Developing training materials, advising managers, measuring progress.",
+        "contribution": "Equips HR to design effective learning and culture programs.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Climate Policy Awareness",
+        "action": "Reviewing regulations, briefing leaders, updating policies.",
+        "contribution": "Avoids compliance risks and supports proactive action.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Diversity Integration",
+        "action": "Linking DEI and sustainability metrics, developing inclusive practices.",
+        "contribution": "Strengthens culture and social impact.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Inclusion Commitment",
+        "action": "Addressing bias, celebrating diversity, promoting psychological safety.",
+        "contribution": "Drives engagement and retention.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Purpose Driven",
+        "action": "Sharing success stories, aligning goals to purpose, recognising contributions.",
+        "contribution": "Enhances motivation and performance.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Wellbeing Focus",
+        "action": "Offering flexible working, mental health support, health promotion programs.",
+        "contribution": "Builds resilience and attracts talent.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Culture Building",
+        "action": "Running engagement programs, championing recognition, reinforcing rituals.",
+        "contribution": "Embeds long-term behavioural change.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Empathy Orientation",
+        "action": "Conducting listening exercises, adapting policies, modelling understanding.",
+        "contribution": "Increases inclusion and quality of solutions.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Open Communication",
+        "action": "Regular updates, clear expectations, two-way feedback channels.",
+        "contribution": "Builds trust and credibility.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "CxO": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "ESG Strategy Design",
+        "action": "Leading strategy workshops, aligning goals to purpose, approving investments.",
+        "contribution": "Sets the direction and inspires action.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Decarbonisation Roadmapping",
+        "action": "Setting targets, allocating resources, reviewing progress.",
+        "contribution": "Drives accountability and progress.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Sustainable Investment",
+        "action": "Approving green investments, reallocating budgets, supporting pilots.",
+        "contribution": "Speeds innovation and demonstrates leadership.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Climate Governance",
+        "action": "Reviewing dashboards, approving policies, engaging with stakeholders.",
+        "contribution": "Builds trust with stakeholders and ensures compliance.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Regulatory Mastery",
+        "action": "Regular briefings, scenario planning, engaging with policymakers.",
+        "contribution": "Reduces risk and improves readiness.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "TCFD Familiarity",
+        "action": "Reviewing reports, ensuring alignment to best practice, briefing investors.",
+        "contribution": "Enhances transparency and reputation.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Visionary Leadership",
+        "action": "Publicly committing to targets, role-modelling behaviours, storytelling.",
+        "contribution": "Creates momentum and clarity.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Stewardship Values",
+        "action": "Approving long-term investments, challenging short-termism, mentoring leaders.",
+        "contribution": "Demonstrates authenticity and responsibility.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Systemic Responsibility",
+        "action": "Advocating for collaboration, addressing supply chain risks, engaging in partnerships.",
+        "contribution": "Creates broader positive impact and resilience.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Bold Commitment",
+        "action": "Setting stretch goals, investing ahead of regulation, championing innovation.",
+        "contribution": "Accelerates progress and inspires confidence.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Accountability Driven",
+        "action": "Regular reporting, transparent updates, course correcting when needed.",
+        "contribution": "Builds credibility and drives performance.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Adaptive Mindset",
+        "action": "Reviewing progress, updating priorities, reallocating resources.",
+        "contribution": "Maintains relevance and resilience.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "Operations": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Energy Efficiency",
+        "action": "Upgrading equipment, optimising schedules, tracking energy performance.",
+        "contribution": "Cuts costs and supports decarbonisation commitments.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Circular Process Design",
+        "action": "Setting up closed-loop systems, redesigning packaging, specifying recyclable materials.",
+        "contribution": "Reduces resource use and aligns with circular economy strategies.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Waste Reduction",
+        "action": "Conducting waste audits, implementing reduction plans, measuring progress.",
+        "contribution": "Reduces environmental impacts and regulatory risks.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Process Footprinting",
+        "action": "Creating impact maps, benchmarking performance, sharing insights.",
+        "contribution": "Informs decisions to prioritise improvements.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Emissions Tracking",
+        "action": "Installing meters, maintaining records, integrating data into reporting.",
+        "contribution": "Ensures accurate reporting and supports progress monitoring.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "ESG Compliance",
+        "action": "Reviewing requirements, updating procedures, training staff.",
+        "contribution": "Avoids legal risks and builds credibility.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Operational Integrity",
+        "action": "Meeting targets, disclosing progress, flagging issues promptly.",
+        "contribution": "Builds trust internally and externally.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Resource Responsibility",
+        "action": "Reducing scrap rates, optimising processes, training teams.",
+        "contribution": "Reduces costs and environmental impacts.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Transparency Ethos",
+        "action": "Publishing dashboards, sharing lessons learned, updating teams.",
+        "contribution": "Builds credibility with stakeholders.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Improvement Focus",
+        "action": "Suggesting new ideas, testing pilots, celebrating improvements.",
+        "contribution": "Drives ongoing progress and innovation.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Ownership Culture",
+        "action": "Setting clear expectations, recognising success, addressing gaps quickly.",
+        "contribution": "Increases engagement and delivery of targets.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Results Orientation",
+        "action": "Defining KPIs, tracking impact rigorously, reporting transparently.",
+        "contribution": "Delivers credibility and progress.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ],
+    "R&D": [
+      {
+        "skill_family": "Technical",
+        "green_skill": "Sustainable Design",
+        "action": "Using eco-design tools, specifying low-impact materials, testing prototypes.",
+        "contribution": "Drives innovation and aligns with sustainability goals.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Low-Carbon Prototyping",
+        "action": "Selecting clean technologies, measuring impacts, iterating designs.",
+        "contribution": "Enables rapid learning and reduces risks.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Technical",
+        "green_skill": "Lifecycle Impact",
+        "action": "Completing LCAs, sharing data with stakeholders, integrating findings.",
+        "contribution": "Informs better decisions and supports credible claims.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\u267b\ufe0f Decarbonisation / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Circular Innovation",
+        "action": "Developing take-back schemes, designing modular products, using recycled content.",
+        "contribution": "Supports transition to circular economy.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Eco-Material Knowledge",
+        "action": "Researching suppliers, testing materials, documenting performance.",
+        "contribution": "Enables informed material selection and innovation.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Knowledgeable",
+        "green_skill": "Climate Solutions",
+        "action": "Prototyping clean tech, scaling solutions, measuring benefits.",
+        "contribution": "Positions the organisation as a leader in sustainability.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \ud83d\udcca Data & AI Maturity",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Regenerative Thinking",
+        "action": "Developing regenerative products, testing closed-loop models, collaborating with partners.",
+        "contribution": "Builds resilience and leadership.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Future Orientation",
+        "action": "Incorporating scenarios, engaging stakeholders, reviewing legacy impacts.",
+        "contribution": "Avoids short-termism and builds credibility.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Values",
+        "green_skill": "Impact Awareness",
+        "action": "Documenting impacts, disclosing limitations, updating designs.",
+        "contribution": "Builds transparency and trust.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83c\udf31 Climate Fluency / \u26a0\ufe0f Risk",
+        "priority": "High"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Curiosity Driven",
+        "action": "Piloting new approaches, asking questions, sharing insights.",
+        "contribution": "Drives innovation and adaptability.",
+        "target_maturity": "Curious Explorer",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Foundation"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Challenge Acceptance",
+        "action": "Leading pilots, iterating under uncertainty, engaging cross-functional teams.",
+        "contribution": "Enables breakthroughs and resilience.",
+        "target_maturity": "Engaged Learner",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "Medium"
+      },
+      {
+        "skill_family": "Attitudes",
+        "green_skill": "Experimentation Focus",
+        "action": "Running experiments, sharing learnings, pivoting when needed.",
+        "contribution": "Speeds progress and reduces risks.",
+        "target_maturity": "Active Contributor",
+        "linked_theme": "\ud83d\udcca Data & AI Maturity / \ud83d\udd04 Circular Practices",
+        "priority": "High"
+      }
+    ]
+  },
+  "scorecard": {
+    "Procurement": {
+      "desired_knowledge": 0.9,
+      "current_capability": 0.5,
+      "gap": 0.4,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Critical"
+    },
+    "Finance": {
+      "desired_knowledge": 0.85,
+      "current_capability": 0.0,
+      "gap": 0.85,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "High"
+    },
+    "Marketing": {
+      "desired_knowledge": 0.55,
+      "current_capability": 0.0,
+      "gap": 0.55,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Medium"
+    },
+    "IT": {
+      "desired_knowledge": 0.4,
+      "current_capability": 0.0,
+      "gap": 0.4,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Medium"
+    },
+    "Legal": {
+      "desired_knowledge": 0.75,
+      "current_capability": 0.0,
+      "gap": 0.75,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "High"
+    },
+    "Supply Chain": {
+      "desired_knowledge": 0.85,
+      "current_capability": 0.0,
+      "gap": 0.85,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "High"
+    },
+    "HR": {
+      "desired_knowledge": 0.5,
+      "current_capability": 0.0,
+      "gap": 0.5,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Medium"
+    },
+    "CxO / Executive": {
+      "desired_knowledge": 0.9,
+      "current_capability": 0.0,
+      "gap": 0.9,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Critical"
+    },
+    "Operations": {
+      "desired_knowledge": 0.95,
+      "current_capability": 0.0,
+      "gap": 0.95,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Critical"
+    },
+    "R&D": {
+      "desired_knowledge": 0.7,
+      "current_capability": 0.0,
+      "gap": 0.7,
+      "themes": "Climate Fluency | Decarbonisation | Data & AI | Risk | Circular Practices",
+      "green_skills_count": 12,
+      "priority_level": "Medium"
+    }
+  },
+  "skills_by_family": {
+    "Procurement": {
+      "technical": "\u2022 Sustainable Sourcing\n\u2022 Life Cycle Analysis\n\u2022 Low-Carbon Contracting",
+      "knowledgeable": "\u2022 Supplier Emissions Data\n\u2022 Circular Procurement\n\u2022 Scope 3 Reporting",
+      "values": "\u2022 Ethical Purchasing\n\u2022 Transparency Focus\n\u2022 Responsibility Mindset",
+      "attitudes": "\u2022 Proactive Engagement\n\u2022 Continuous Improvement\n\u2022 Collaboration Driven"
+    },
+    "Finance": {
+      "technical": "\u2022 ESG Risk Modelling\n\u2022 Carbon Costing\n\u2022 Impact Investing",
+      "knowledgeable": "\u2022 Green Finance Principles\n\u2022 Regulatory Compliance\n\u2022 TCFD Knowledge",
+      "values": "\u2022 Stewardship Commitment\n\u2022 Integrity Orientation\n\u2022 Purpose Driven",
+      "attitudes": "\u2022 Long-Term Thinking\n\u2022 Accountability Culture\n\u2022 Results Focused"
+    },
+    "Marketing": {
+      "technical": "\u2022 Green Claims Review\n\u2022 Low-Impact Campaigns\n\u2022 Eco-Labelling Compliance",
+      "knowledgeable": "\u2022 Sustainability Storytelling\n\u2022 Behavioural Insights\n\u2022 Circular Promotion",
+      "values": "\u2022 Authentic Messaging\n\u2022 Honesty in Claims\n\u2022 Social Responsibility",
+      "attitudes": "\u2022 Customer Centricity\n\u2022 Openness to Feedback\n\u2022 Learning Orientation"
+    },
+    "IT": {
+      "technical": "\u2022 Green Software Design\n\u2022 Cloud Efficiency\n\u2022 Data Footprint Reduction",
+      "knowledgeable": "\u2022 ESG Data Management\n\u2022 AI Ethics Knowledge\n\u2022 Cyber-ESG Risk",
+      "values": "\u2022 Digital Responsibility\n\u2022 Transparency Culture\n\u2022 Privacy Respect",
+      "attitudes": "\u2022 Innovation Mindset\n\u2022 Problem Solving\n\u2022 Adaptive Thinking"
+    },
+    "Legal": {
+      "technical": "\u2022 ESG Contract Clauses\n\u2022 Greenwashing Defense\n\u2022 Circular Policy Drafting",
+      "knowledgeable": "\u2022 Environmental Regulations\n\u2022 Climate Disclosure Rules\n\u2022 Due Diligence Law",
+      "values": "\u2022 Fairness Focus\n\u2022 Compliance Ethos\n\u2022 Justice Orientation",
+      "attitudes": "\u2022 Integrity Driven\n\u2022 Risk Awareness\n\u2022 Critical Analysis"
+    },
+    "Supply Chain": {
+      "technical": "\u2022 Carbon Hotspot Mapping\n\u2022 Low-Emission Transport\n\u2022 Circular Inventory",
+      "knowledgeable": "\u2022 Circular Logistics\n\u2022 Scope 3 Visibility\n\u2022 Climate Risk Planning",
+      "values": "\u2022 Responsible Sourcing\n\u2022 Resource Stewardship\n\u2022 Fair Trade Values",
+      "attitudes": "\u2022 Resilience Focus\n\u2022 Partnership Mindset\n\u2022 Systems Thinking"
+    },
+    "HR": {
+      "technical": "\u2022 Green Workforce Planning\n\u2022 Sustainable Benefits\n\u2022 Net Zero Onboarding",
+      "knowledgeable": "\u2022 ESG Training Knowledge\n\u2022 Climate Policy Awareness\n\u2022 Diversity Integration",
+      "values": "\u2022 Inclusion Commitment\n\u2022 Purpose Driven\n\u2022 Wellbeing Focus",
+      "attitudes": "\u2022 Culture Building\n\u2022 Empathy Orientation\n\u2022 Open Communication"
+    },
+    "CxO": {
+      "technical": "\u2022 ESG Strategy Design\n\u2022 Decarbonisation Roadmapping\n\u2022 Sustainable Investment",
+      "knowledgeable": "\u2022 Climate Governance\n\u2022 Regulatory Mastery\n\u2022 TCFD Familiarity",
+      "values": "\u2022 Visionary Leadership\n\u2022 Stewardship Values\n\u2022 Systemic Responsibility",
+      "attitudes": "\u2022 Bold Commitment\n\u2022 Accountability Driven\n\u2022 Adaptive Mindset"
+    },
+    "Operations": {
+      "technical": "\u2022 Energy Efficiency\n\u2022 Circular Process Design\n\u2022 Waste Reduction",
+      "knowledgeable": "\u2022 Process Footprinting\n\u2022 Emissions Tracking\n\u2022 ESG Compliance",
+      "values": "\u2022 Operational Integrity\n\u2022 Resource Responsibility\n\u2022 Transparency Ethos",
+      "attitudes": "\u2022 Improvement Focus\n\u2022 Ownership Culture\n\u2022 Results Orientation"
+    },
+    "R&D": {
+      "technical": "\u2022 Sustainable Design\n\u2022 Low-Carbon Prototyping\n\u2022 Lifecycle Impact",
+      "knowledgeable": "\u2022 Circular Innovation\n\u2022 Eco-Material Knowledge\n\u2022 Climate Solutions",
+      "values": "\u2022 Regenerative Thinking\n\u2022 Future Orientation\n\u2022 Impact Awareness",
+      "attitudes": "\u2022 Curiosity Driven\n\u2022 Challenge Acceptance\n\u2022 Experimentation Focus"
+    }
+  },
+  "maturity_levels": [
+    "Curious Explorer",
+    "Engaged Learner",
+    "Active Contributor",
+    "Conscious Changemaker"
+  ],
+  "themes": [
+    "Climate Fluency",
+    "Decarbonisation",
+    "Data & AI Maturity",
+    "Risk",
+    "Circular Practices"
+  ]
+}

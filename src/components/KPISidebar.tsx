@@ -2,7 +2,8 @@
 
 import React, { useState, useCallback } from "react";
 import { Department, GreenSkill, ViewLevel } from "@/lib/types";
-import { getSeverityGlowColor, formatScore, OPT_COLUMNS, formatOptLabel } from "@/lib/utils";
+import { getSeverityGlowColor, formatScore, OPT_COLUMNS, formatOptLabel, computeAvgOpt } from "@/lib/utils";
+import { getTopPrioritySkills, getQuickWins, getComplianceRiskSkills, computeSkillRiskScore, getMaturityLabel, computeDeptRiskScore } from "@/lib/gapAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import MethodologyModal from "./MethodologyModal";
 
@@ -15,38 +16,30 @@ interface KPISidebarProps {
 }
 
 function exportCSV(departments: Department[], skills: GreenSkill[]) {
-  // Build comprehensive CSV with all skill data
   const headers = [
     "Department", "Skill Family", "Green Skill", "Theme",
     "Current Level", "Required Level", "Gap", "Severity",
-    "Priority", "Description", "Why It Matters",
+    "Priority", "Current Maturity", "Required Maturity", "Risk Score",
+    "Description", "Why It Matters",
     ...OPT_COLUMNS.map(c => formatOptLabel(c)),
   ];
-
   const rows = skills.map(s => [
-    s.department,
-    s.skill_family,
-    s.green_skill,
-    s.theme,
-    s.current_level,
-    s.required_level,
-    s.gap,
-    s.severity,
-    s.priority_level,
+    s.department, s.skill_family, s.green_skill, s.theme,
+    s.current_level, s.required_level, s.gap, s.severity,
+    s.priority_level, getMaturityLabel(s.current_level), getMaturityLabel(s.required_level),
+    (computeSkillRiskScore(s) * 100).toFixed(0) + "%",
     `"${(s.description || "").replace(/"/g, '""')}"`,
     `"${(s.why_it_matters || "").replace(/"/g, '""')}"`,
     ...OPT_COLUMNS.map(c => Number((s as any)[c]) || 0),
   ]);
-
-  // Department summary section
-  const deptHeaders = ["Department", "Overall Score", "Gap Severity", "Priority", "Critical Gaps", "Moderate Gaps", "No Gap", "Desired Knowledge", "Top Gaps"];
+  const deptHeaders = ["Department", "Overall Score", "Gap Severity", "Priority", "Risk Score", "Critical Gaps", "Moderate Gaps", "No Gap", "Desired Knowledge", "Top Gaps"];
   const deptRows = departments.map(d => [
     d.label, d.overall_score, d.gap_severity, d.priority_level,
+    (computeDeptRiskScore(d, skills) * 100).toFixed(0) + "%",
     d.critical_gap_count, d.moderate_gap_count, d.no_gap_count,
     `"${(d.desired_knowledge || "").replace(/"/g, '""')}"`,
     `"${(d.top_gaps || "").replace(/"/g, '""')}"`,
   ]);
-
   const csv = [
     "=== DEPARTMENT SUMMARY ===",
     deptHeaders.join(","),
@@ -56,7 +49,6 @@ function exportCSV(departments: Department[], skills: GreenSkill[]) {
     headers.join(","),
     ...rows.map(r => r.join(",")),
   ].join("\n");
-
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -66,8 +58,11 @@ function exportCSV(departments: Department[], skills: GreenSkill[]) {
   URL.revokeObjectURL(url);
 }
 
+type SidebarTab = "overview" | "actions" | "risks";
+
 export default function KPISidebar({ departments, allSkills, selectedDept, currentSkills, viewLevel: _viewLevel }: KPISidebarProps) {
   const [showMethodology, setShowMethodology] = useState(false);
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>("overview");
 
   const totalCritical = departments.reduce((s, d) => s + (d.critical_gap_count || 0), 0);
   const totalModerate = departments.reduce((s, d) => s + (d.moderate_gap_count || 0), 0);
@@ -77,14 +72,13 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
   const totalScore = departments.reduce((s, d) => s + (d.overall_score || 0), 0);
   const avgScore = departments.length > 0 ? (totalScore / departments.length).toFixed(0) : "0";
 
-  // High-risk departments (critical severity, sorted by critical gap count)
   const highRiskDepts = [...departments]
-    .filter(d => d.gap_severity?.toLowerCase() === "critical")
-    .sort((a, b) => (b.critical_gap_count || 0) - (a.critical_gap_count || 0));
+    .map(d => ({ dept: d, riskScore: computeDeptRiskScore(d, allSkills) }))
+    .sort((a, b) => b.riskScore - a.riskScore)
+    .filter(d => d.dept.gap_severity?.toLowerCase() === "critical");
 
   const sortedDepts = [...departments].sort((a, b) => (b.critical_gap_count || 0) - (a.critical_gap_count || 0));
 
-  // Theme breakdown from skills
   const themes = allSkills.reduce((acc, s) => {
     const t = s.theme || "Other";
     if (!acc[t]) acc[t] = { critical: 0, moderate: 0, noGap: 0, total: 0 };
@@ -95,24 +89,11 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
     return acc;
   }, {} as Record<string, { critical: number; moderate: number; noGap: number; total: number }>);
 
-  // Department × Theme heatmap data
-  const themeNames = Object.keys(themes);
-  const heatmapData = departments.map(dept => {
-    const deptSkills = allSkills.filter(s => s.department === dept.id);
-    const byTheme: Record<string, { crit: number; mod: number; noGap: number }> = {};
-    themeNames.forEach(t => { byTheme[t] = { crit: 0, mod: 0, noGap: 0 }; });
-    deptSkills.forEach(s => {
-      const t = s.theme || "Other";
-      if (byTheme[t]) {
-        if (s.severity?.toLowerCase() === "critical") byTheme[t].crit++;
-        else if (s.severity?.toLowerCase() === "moderate") byTheme[t].mod++;
-        else byTheme[t].noGap++;
-      }
-    });
-    return { dept, byTheme };
-  });
+  // Priority analytics
+  const topPrioritySkills = getTopPrioritySkills(allSkills, 8);
+  const quickWins = getQuickWins(allSkills);
+  const complianceRisks = getComplianceRiskSkills(allSkills);
 
-  // Selected dept opt factors (all 16)
   const selectedDeptFactors = selectedDept
     ? OPT_COLUMNS.map((col) => ({
         label: formatOptLabel(col),
@@ -186,150 +167,224 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
           </div>
         </div>
 
-        {/* HIGH-RISK ROLES TABLE */}
-        {highRiskDepts.length > 0 && !selectedDept && (
-          <div className="px-5 py-3 border-b border-white/5">
-            <div className="text-[9px] uppercase tracking-wider text-red-400/60 mb-2">High-Risk Departments</div>
-            <div className="space-y-1">
-              {highRiskDepts.map((dept) => (
-                <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
-                  <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" style={{ boxShadow: "0 0 6px #ef444466" }} />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[11px] text-white/80 font-medium truncate block">{dept.label}</span>
-                    <div className="flex gap-2 text-[9px]">
-                      <span className="text-red-400">{dept.critical_gap_count} critical</span>
-                      <span className="text-white/30">Priority: {dept.priority_level}</span>
+        {/* === TAB SWITCHER (only when no dept selected) === */}
+        {!selectedDept && (
+          <div className="flex border-b border-white/5">
+            {([
+              { key: "overview" as SidebarTab, label: "Overview" },
+              { key: "actions" as SidebarTab, label: "Priority Actions" },
+              { key: "risks" as SidebarTab, label: "Risks" },
+            ]).map(tab => (
+              <button key={tab.key} onClick={() => setSidebarTab(tab.key)}
+                className={`flex-1 py-2 text-[9px] uppercase tracking-wider transition-colors ${sidebarTab === tab.key ? "text-white bg-white/[0.06] border-b border-white/20" : "text-white/30 hover:text-white/60"}`}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* === OVERVIEW TAB === */}
+        {!selectedDept && sidebarTab === "overview" && (
+          <>
+            {/* High-Risk Departments */}
+            {highRiskDepts.length > 0 && (
+              <div className="px-5 py-3 border-b border-white/5">
+                <div className="text-[9px] uppercase tracking-wider text-red-400/60 mb-2">High-Risk Departments</div>
+                <div className="space-y-1">
+                  {highRiskDepts.map(({ dept, riskScore }) => (
+                    <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-red-500/[0.06] border border-red-500/10">
+                      <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" style={{ boxShadow: "0 0 6px #ef444466" }} />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] text-white/80 font-medium truncate block">{dept.label}</span>
+                        <div className="flex gap-2 text-[9px]">
+                          <span className="text-red-400">{dept.critical_gap_count} critical</span>
+                          <span className="text-white/30">Risk: {(riskScore * 100).toFixed(0)}%</span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-white/50 font-mono">{dept.overall_score}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* All Departments */}
+            <div className="px-5 py-3 border-b border-white/5 flex-1 min-h-0 overflow-y-auto">
+              <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">All Departments</div>
+              <div className="space-y-1">
+                {sortedDepts.map((dept) => {
+                  const color = getSeverityGlowColor(dept.gap_severity);
+                  const total = (dept.critical_gap_count || 0) + (dept.moderate_gap_count || 0) + (dept.no_gap_count || 0);
+                  return (
+                    <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02] border border-transparent">
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color, boxShadow: `0 0 4px ${color}66` }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] text-white/80 truncate font-medium">{dept.label}</span>
+                          <span className="text-[10px] text-white/50 ml-1">{dept.overall_score}</span>
+                        </div>
+                        <div className="flex h-1 rounded-full overflow-hidden mt-0.5">
+                          {total > 0 && (
+                            <>
+                              <div className="bg-red-500" style={{ width: `${((dept.critical_gap_count || 0) / total) * 100}%` }} />
+                              <div className="bg-amber-500" style={{ width: `${((dept.moderate_gap_count || 0) / total) * 100}%` }} />
+                              <div className="bg-green-500" style={{ width: `${((dept.no_gap_count || 0) / total) * 100}%` }} />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-medium px-1 py-0.5 rounded" style={{ color, backgroundColor: color + "15" }}>
+                        {dept.gap_severity?.slice(0, 4)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* By Theme */}
+            <div className="px-5 py-3 border-b border-white/5">
+              <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">By Theme</div>
+              <div className="space-y-1.5">
+                {Object.entries(themes).map(([theme, counts]) => (
+                  <div key={theme}>
+                    <div className="flex items-center justify-between text-[10px] mb-0.5">
+                      <span className="text-white/60 truncate">{theme}</span>
+                      <div className="flex gap-2">
+                        {counts.critical > 0 && <span className="text-red-400">{counts.critical}C</span>}
+                        {counts.moderate > 0 && <span className="text-amber-400">{counts.moderate}M</span>}
+                        <span className="text-green-400">{counts.noGap}G</span>
+                      </div>
+                    </div>
+                    <div className="flex h-1 rounded-full overflow-hidden">
+                      {counts.total > 0 && (
+                        <>
+                          <div className="bg-red-500" style={{ width: `${(counts.critical / counts.total) * 100}%` }} />
+                          <div className="bg-amber-500" style={{ width: `${(counts.moderate / counts.total) * 100}%` }} />
+                          <div className="bg-green-500" style={{ width: `${(counts.noGap / counts.total) * 100}%` }} />
+                        </>
+                      )}
                     </div>
                   </div>
-                  <span className="text-[10px] text-white/50 font-mono">{dept.overall_score}</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
-        {/* DEPARTMENT×THEME HEATMAP */}
-        {!selectedDept && (
-          <div className="px-5 py-3 border-b border-white/5">
-            <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">Department × Theme Heatmap</div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-[9px]">
-                <thead>
-                  <tr>
-                    <th className="text-left text-white/30 font-normal pb-1 pr-1">Dept</th>
-                    {themeNames.map(t => (
-                      <th key={t} className="text-center text-white/30 font-normal pb-1 px-0.5" title={t}>
-                        {t.length > 8 ? t.slice(0, 7) + "…" : t}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {heatmapData.map(({ dept, byTheme }) => (
-                    <tr key={dept.id}>
-                      <td className="text-white/50 pr-1 py-0.5 truncate max-w-[80px]" title={dept.label}>
-                        {dept.label.length > 10 ? dept.label.slice(0, 9) + "…" : dept.label}
-                      </td>
-                      {themeNames.map(t => {
-                        const cell = byTheme[t];
-                        const total = cell.crit + cell.mod + cell.noGap;
-                        // Color intensity based on severity
-                        let bg = "transparent";
-                        if (total > 0) {
-                          if (cell.crit > 0) bg = `rgba(239,68,68,${0.15 + (cell.crit / total) * 0.4})`;
-                          else if (cell.mod > 0) bg = `rgba(245,158,11,${0.15 + (cell.mod / total) * 0.3})`;
-                          else bg = `rgba(34,197,94,${0.15 + (cell.noGap / total) * 0.3})`;
-                        }
-                        return (
-                          <td key={t} className="text-center py-0.5 px-0.5">
-                            <div className="rounded px-1 py-0.5 text-white/70 font-mono" style={{ backgroundColor: bg }} title={`${dept.label} - ${t}: ${cell.crit}C ${cell.mod}M ${cell.noGap}G`}>
-                              {total > 0 ? total : "—"}
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex items-center gap-3 mt-2 text-[8px] text-white/30">
-              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-red-500/40" /> Critical</div>
-              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-amber-500/40" /> Moderate</div>
-              <div className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-green-500/40" /> No Gap</div>
-            </div>
-          </div>
-        )}
-
-        {/* All Departments List (shown when no dept selected) */}
-        {!selectedDept && (
-          <div className="px-5 py-3 border-b border-white/5 flex-1 min-h-0 overflow-y-auto">
-            <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">All Departments</div>
-            <div className="space-y-1">
-              {sortedDepts.map((dept) => {
-                const color = getSeverityGlowColor(dept.gap_severity);
-                const total = (dept.critical_gap_count || 0) + (dept.moderate_gap_count || 0) + (dept.no_gap_count || 0);
+        {/* === PRIORITY ACTIONS TAB === */}
+        {!selectedDept && sidebarTab === "actions" && (
+          <div className="px-5 py-3 flex-1 min-h-0 overflow-y-auto">
+            <div className="text-[9px] uppercase tracking-wider text-white/30 mb-1">Top Priority Skills to Develop</div>
+            <p className="text-[9px] text-white/40 mb-3">Ranked by risk score — combining gap severity, sustainability impact, and priority level.</p>
+            <div className="space-y-1.5">
+              {topPrioritySkills.map(({ skill, riskScore }, i) => {
+                const color = getSeverityGlowColor(skill.severity === "No Gap" ? "healthy" : skill.severity);
                 return (
-                  <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02] border border-transparent">
-                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color, boxShadow: `0 0 4px ${color}66` }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-white/80 truncate font-medium">{dept.label}</span>
-                        <span className="text-[10px] text-white/50 ml-1">{dept.overall_score}</span>
-                      </div>
-                      <div className="flex h-1 rounded-full overflow-hidden mt-0.5">
-                        {total > 0 && (
-                          <>
-                            <div className="bg-red-500" style={{ width: `${((dept.critical_gap_count || 0) / total) * 100}%` }} />
-                            <div className="bg-amber-500" style={{ width: `${((dept.moderate_gap_count || 0) / total) * 100}%` }} />
-                            <div className="bg-green-500" style={{ width: `${((dept.no_gap_count || 0) / total) * 100}%` }} />
-                          </>
-                        )}
-                      </div>
+                  <div key={skill.id} className="px-2 py-2 rounded-lg bg-white/[0.03] border border-white/5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[9px] font-mono text-white/25 w-3">#{i + 1}</span>
+                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                      <span className="text-[10px] text-white/80 font-medium truncate flex-1">{skill.green_skill}</span>
+                      <span className="text-[9px] font-mono px-1 py-0.5 rounded" style={{ color: riskScore >= 0.5 ? "#ef4444" : "#f59e0b", backgroundColor: riskScore >= 0.5 ? "#ef444415" : "#f59e0b15" }}>
+                        {(riskScore * 100).toFixed(0)}%
+                      </span>
                     </div>
-                    <span className="text-[9px] font-medium px-1 py-0.5 rounded" style={{ color, backgroundColor: color + "15" }}>
-                      {dept.gap_severity?.slice(0, 4)}
-                    </span>
+                    <div className="flex flex-wrap gap-1 ml-5 text-[8px]">
+                      <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">{skill.department}</span>
+                      <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">{skill.skill_family}</span>
+                      <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">Gap: {skill.gap}</span>
+                      <span className="px-1 py-0.5 rounded bg-white/5 text-white/40">
+                        {getMaturityLabel(skill.current_level)} → {getMaturityLabel(skill.required_level)}
+                      </span>
+                    </div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Quick Wins */}
+            {quickWins.length > 0 && (
+              <div className="mt-4">
+                <div className="text-[9px] uppercase tracking-wider text-green-400/60 mb-1">Quick Wins</div>
+                <p className="text-[9px] text-white/40 mb-2">Moderate gaps with high sustainability impact — easy to close, high reward.</p>
+                <div className="space-y-1">
+                  {quickWins.slice(0, 5).map(skill => (
+                    <div key={skill.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-green-500/[0.04] border border-green-500/10">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+                      <span className="text-[10px] text-white/70 truncate flex-1">{skill.green_skill}</span>
+                      <span className="text-[8px] text-white/40">{skill.department}</span>
+                      <span className="text-[9px] text-green-400/70 font-mono">{(computeAvgOpt(skill) * 100).toFixed(0)}% impact</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Theme Breakdown */}
-        <div className="px-5 py-3 border-b border-white/5">
-          <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">By Theme</div>
-          <div className="space-y-1.5">
-            {Object.entries(themes).map(([theme, counts]) => (
-              <div key={theme}>
-                <div className="flex items-center justify-between text-[10px] mb-0.5">
-                  <span className="text-white/60 truncate">{theme}</span>
-                  <div className="flex gap-2">
-                    {counts.critical > 0 && <span className="text-red-400">{counts.critical}C</span>}
-                    {counts.moderate > 0 && <span className="text-amber-400">{counts.moderate}M</span>}
-                    <span className="text-green-400">{counts.noGap}G</span>
-                  </div>
+        {/* === RISKS TAB === */}
+        {!selectedDept && sidebarTab === "risks" && (
+          <div className="px-5 py-3 flex-1 min-h-0 overflow-y-auto">
+            {/* Compliance risk skills */}
+            <div className="mb-4">
+              <div className="text-[9px] uppercase tracking-wider text-red-400/60 mb-1">Compliance & Regulatory Risk</div>
+              <p className="text-[9px] text-white/40 mb-2">Critical gaps in climate/risk-linked skills that expose the organisation to regulatory penalties.</p>
+              {complianceRisks.length > 0 ? (
+                <div className="space-y-1">
+                  {complianceRisks.slice(0, 8).map(skill => (
+                    <div key={skill.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-red-500/[0.04] border border-red-500/10">
+                      <div className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] text-white/70 truncate block">{skill.green_skill}</span>
+                        <div className="flex gap-2 text-[8px] text-white/30">
+                          <span>{skill.department}</span>
+                          <span>{skill.theme}</span>
+                        </div>
+                      </div>
+                      <span className="text-[9px] text-red-400 font-mono">-{skill.gap}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex h-1 rounded-full overflow-hidden">
-                  {counts.total > 0 && (
-                    <>
-                      <div className="bg-red-500" style={{ width: `${(counts.critical / counts.total) * 100}%` }} />
-                      <div className="bg-amber-500" style={{ width: `${(counts.moderate / counts.total) * 100}%` }} />
-                      <div className="bg-green-500" style={{ width: `${(counts.noGap / counts.total) * 100}%` }} />
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ) : (
+                <div className="text-[10px] text-white/30">No critical compliance risks identified.</div>
+              )}
+            </div>
 
-        {/* === SELECTED DEPARTMENT DETAIL SECTION === */}
+            {/* Department risk ranking */}
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-white/30 mb-1">Department Risk Ranking</div>
+              <p className="text-[9px] text-white/40 mb-2">Departments ranked by weighted risk score factoring gap severity, opt impact, and priority.</p>
+              <div className="space-y-1">
+                {[...departments]
+                  .map(d => ({ dept: d, risk: computeDeptRiskScore(d, allSkills) }))
+                  .sort((a, b) => b.risk - a.risk)
+                  .map(({ dept, risk }, i) => {
+                    const color = getSeverityGlowColor(dept.gap_severity);
+                    return (
+                      <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02]">
+                        <span className="text-[9px] font-mono text-white/20 w-3">#{i + 1}</span>
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                        <span className="text-[10px] text-white/70 truncate flex-1">{dept.label}</span>
+                        <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full" style={{
+                            width: `${risk * 100}%`,
+                            backgroundColor: risk >= 0.5 ? "#ef4444" : risk >= 0.3 ? "#f59e0b" : "#22c55e",
+                          }} />
+                        </div>
+                        <span className="text-[9px] font-mono text-white/40 w-8 text-right">{(risk * 100).toFixed(0)}%</span>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* === SELECTED DEPARTMENT DETAIL === */}
         <AnimatePresence>
           {selectedDept && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
-              {/* Department header */}
               <div className="px-5 py-3 border-b border-white/5 bg-white/[0.02]">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getSeverityGlowColor(selectedDept.gap_severity), boxShadow: `0 0 6px ${getSeverityGlowColor(selectedDept.gap_severity)}66` }} />
@@ -351,7 +406,6 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                 </div>
               </div>
 
-              {/* Skills list for selected dept */}
               {currentSkills.length > 0 && (
                 <div className="px-5 py-3 border-b border-white/5">
                   <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">
@@ -366,7 +420,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                           <span className="text-white/60 truncate flex-1">{skill.green_skill}</span>
                           <span className="text-white/40">{skill.current_level}/{skill.required_level}</span>
                           <span className="font-mono font-medium" style={{ color: skillColor }}>
-                            {skill.gap > 0 ? `-${skill.gap}` : "✓"}
+                            {skill.gap > 0 ? `-${skill.gap}` : "ok"}
                           </span>
                         </div>
                       );
@@ -375,13 +429,10 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                 </div>
               )}
 
-              {/* All 16 Opt Factors for selected dept */}
               <div className="px-5 py-3 border-b border-white/5">
-                <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">
-                  {selectedDept.label} — All Optimization Factors
-                </div>
-                <div className="space-y-1.5 max-h-60 overflow-y-auto">
-                  {selectedDeptFactors.map((f) => (
+                <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">Optimization Factors</div>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {selectedDeptFactors.slice(0, 8).map((f) => (
                     <div key={f.label}>
                       <div className="flex justify-between text-[10px] mb-0.5">
                         <span className="text-white/50">{f.label}</span>
@@ -398,7 +449,6 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                 </div>
               </div>
 
-              {/* Dept additional info */}
               <div className="px-5 py-3 border-b border-white/5">
                 <div className="space-y-1.5 text-[10px]">
                   <div className="flex justify-between">
