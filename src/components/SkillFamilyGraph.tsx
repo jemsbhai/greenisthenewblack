@@ -139,7 +139,7 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     const linkGroup = container.append("g").selectAll("line").data(links).enter().append("line")
       .attr("stroke", "rgba(255,255,255,0.12)").attr("stroke-width", 2).attr("class", "edge-animated");
 
-    container.append("g").selectAll("circle").data(allNodes).enter().append("circle")
+    const glowGroup = container.append("g").selectAll("circle").data(allNodes).enter().append("circle")
       .attr("r", (d) => d.radius * 2).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.5).style("pointer-events", "none");
 
     const nodeGroup = container.append("g").selectAll("circle").data(allNodes).enter().append("circle")
@@ -164,25 +164,25 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       });
 
     // Level number inside node
-    container.append("g").selectAll("text").data(allNodes).enter().append("text")
+    const countText = container.append("g").selectAll("text").data(allNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", d => d.isHub ? "-0.2em" : "0.35em").attr("fill", "white")
       .attr("font-size", (d) => d.isHub ? "12px" : "16px").attr("font-weight", "700").style("pointer-events", "none")
       .text((d) => d.isHub ? department.overall_score : (d.level || ""));
 
     // Hub subtitle
-    container.append("g").selectAll(".hub-sub").data([hubNode]).enter().append("text")
+    const hubSub = container.append("g").selectAll("text").data([hubNode]).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", "1em").attr("fill", "rgba(255,255,255,0.5)")
       .attr("font-size", "8px").style("pointer-events", "none").text("score");
 
     // Labels below nodes
-    container.append("g").selectAll("text.label").data(allNodes).enter().append("text")
+    const labelText = container.append("g").selectAll("text").data(allNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 16)
       .attr("fill", "rgba(255,255,255,0.85)").attr("font-size", (d) => d.isHub ? "13px" : "10px")
       .attr("font-weight", "600").style("pointer-events", "none")
       .text((d) => d.isHub ? deptLabel : d.label);
 
     // Skill names below maturity nodes
-    container.append("g").selectAll("text.skills").data(maturityNodes).enter().append("text")
+    const skillsText1 = container.append("g").selectAll("text").data(maturityNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 28)
       .attr("fill", (d) => d.color).attr("font-size", "8px").style("pointer-events", "none").attr("opacity", 0.7)
       .text((d) => {
@@ -190,7 +190,7 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
         return parts.slice(0, 2).join(" · ");
       });
 
-    container.append("g").selectAll("text.skills2").data(maturityNodes).enter().append("text")
+    const skillsText2 = container.append("g").selectAll("text").data(maturityNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 38)
       .attr("fill", (d) => d.color).attr("font-size", "8px").style("pointer-events", "none").attr("opacity", 0.5)
       .text((d) => {
@@ -206,9 +206,13 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       .on("tick", () => {
         hubNode.x = 0; hubNode.y = 0;
         linkGroup.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y).attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
+        glowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
         nodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-        container.selectAll("circle").attr("cx", (d: any) => d.x ?? 0).attr("cy", (d: any) => d.y ?? 0);
-        container.selectAll("text").attr("x", (d: any) => d.x ?? 0).attr("y", (d: any) => d.y ?? 0);
+        countText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        hubSub.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        labelText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        skillsText1.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        skillsText2.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
       });
 
     return () => { simulation.stop(); };
