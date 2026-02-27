@@ -14,6 +14,7 @@ import {
   fetchEdges,
   fetchAllSkills,
 } from "@/lib/queries";
+import { skillsForDept } from "@/lib/utils";
 import NetworkGraph from "@/components/NetworkGraph";
 import SkillFamilyGraph from "@/components/SkillFamilyGraph";
 import SkillsGraph from "@/components/SkillsGraph";
@@ -67,7 +68,7 @@ export default function Home() {
     (dept: Department) => {
       setSelectedDept(dept);
       setViewLevel("families");
-      const deptSkills = allSkills.filter((s) => s.department === dept.id);
+      const deptSkills = skillsForDept(allSkills, dept);
       setCurrentSkills(deptSkills);
     },
     [allSkills]

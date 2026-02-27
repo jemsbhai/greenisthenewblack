@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import * as d3 from "d3";
 import { Department, DepartmentEdge } from "@/lib/types";
-import { getSeverityGlowColor, computeAvgOpt } from "@/lib/utils";
+import { getSeverityGlowColor, computeAvgOpt, optScoreColor } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NetworkGraphProps {
@@ -45,7 +45,7 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
     const nodes: SimNode[] = departments.map((dept) => ({
       id: dept.id,
       dept,
-      color: getSeverityGlowColor(dept.gap_severity),
+      color: optScoreColor(computeAvgOpt(dept)),
       radius: 32,
     }));
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
@@ -184,10 +184,10 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
             style={{ left: tooltip.x + 15, top: tooltip.y - 10, maxWidth: 320 }}
           >
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getSeverityGlowColor(tooltip.dept.gap_severity), boxShadow: `0 0 8px ${getSeverityGlowColor(tooltip.dept.gap_severity)}66` }} />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: optScoreColor(computeAvgOpt(tooltip.dept)), boxShadow: `0 0 8px ${optScoreColor(computeAvgOpt(tooltip.dept))}66` }} />
               <span className="text-white font-semibold text-sm">{tooltip.dept.label}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: getSeverityGlowColor(tooltip.dept.gap_severity) + "22", color: getSeverityGlowColor(tooltip.dept.gap_severity) }}>
-                {tooltip.dept.gap_severity}
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: optScoreColor(computeAvgOpt(tooltip.dept)) + "22", color: optScoreColor(computeAvgOpt(tooltip.dept)) }}>
+                {(computeAvgOpt(tooltip.dept) * 100).toFixed(0)}%
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-white/60">

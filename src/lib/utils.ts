@@ -105,3 +105,20 @@ export function formatScore(val: number | null | undefined): string {
   if (val === null || val === undefined) return "—";
   return (val * 100).toFixed(0) + "%";
 }
+
+/** Single source of truth: map a 0-1 opt score to a red/amber/green color */
+export function optScoreColor(val: number): string {
+  if (val >= 0.4) return "#22c55e";
+  if (val >= 0.2) return "#f59e0b";
+  return "#ef4444";
+}
+
+/** Match skills to a department — tries both dept.id and dept.department */
+export function skillsForDept<T extends { department: string }>(
+  allSkills: T[],
+  dept: { id: string; department: string }
+): T[] {
+  const byId = allSkills.filter(s => s.department === dept.id);
+  if (byId.length > 0) return byId;
+  return allSkills.filter(s => s.department === dept.department);
+}

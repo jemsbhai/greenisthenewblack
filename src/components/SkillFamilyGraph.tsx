@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useCallback, useState, useMemo } from "react";
 import * as d3 from "d3";
 import { Department, DepartmentEdge, GreenSkill, SkillFamily } from "@/lib/types";
-import { getSeverityGlowColor, getSkillSeverityColor, OPT_COLUMNS, formatOptLabel, formatScore, computeAvgOpt } from "@/lib/utils";
+import { getSeverityGlowColor, getSkillSeverityColor, OPT_COLUMNS, formatOptLabel, formatScore, computeAvgOpt, optScoreColor } from "@/lib/utils";
 import {
   getDeptDirectoryData, getPriorityActions, getMaturityLabel, MATURITY_LEVELS,
   getDeptAssessments, getAllSectors, getDeptSectorPriorities, getDeptSkillsMap,
@@ -98,40 +98,72 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       color: hubSev.color, radius: 44, avgOptScore: deptAvgOpt,
     };
 
-    // ── 16 Opt metric nodes — each colored G/A/R by its actual value ──
-    const optNodes: GraphNode[] = OPT_COLUMNS.map((col) => {
+    // ── Only show opt metrics that have a non-zero dept value ──
+    const activeOptCols = OPT_COLUMNS.filter(col => (Number((department as any)[col]) || 0) > 0);
+    // Fallback: if no opt columns are non-zero, show all of them
+    const displayCols = activeOptCols.length > 0 ? activeOptCols : [...OPT_COLUMNS];
+
+    const optNodes: GraphNode[] = displayCols.map((col) => {
       const val = Number((department as any)[col]) || 0;
       const sev = optSeverity(val);
-      // Find skills that have non-zero value for this opt column
-      const contributing = skills.filter(s => Number((s as any)[col]) > 0);
       return {
         id: `opt-${col}`, label: formatOptLabel(col), kind: "opt" as NodeKind,
         color: sev.color, radius: 22, optKey: col, optValue: val, optSeverity: sev.severity,
-        childCount: contributing.length,
+        childCount: 0, // will be updated below
       };
     });
 
-    // ── Leaf nodes: for each opt metric, the skills that contribute to it ──
+    // ── Assign each skill to one opt metric node ──
+    // Strategy: for each skill, pick the opt metric where the skill's own
+    // opt_* value is highest. If all skill-level values are 0, assign each
+    // skill round-robin across the active opt metrics so all skills are visible.
     const leafNodes: GraphNode[] = [];
-    const seenLeaves = new Set<string>(); // avoid duplicate skill nodes per opt metric
-    optNodes.forEach((on) => {
-      const col = on.optKey!;
-      const contributing = skills.filter(s => Number((s as any)[col]) > 0);
-      contributing.forEach((s, j) => {
-        const leafId = `leaf-${col}-${j}`;
-        if (seenLeaves.has(leafId)) return;
-        seenLeaves.add(leafId);
-        const skillOptVal = Number((s as any)[col]) || 0;
-        const skillSev = optSeverity(skillOptVal);
+    const optChildCounts: Record<string, number> = {};
+
+    // Check if ANY skill has a non-zero opt value at skill level
+    const anySkillHasOpt = skills.some(s =>
+      displayCols.some(col => Number((s as any)[col]) > 0)
+    );
+
+    if (anySkillHasOpt) {
+      // Assign skill to its best-matching opt metric
+      skills.forEach((s) => {
+        let bestCol = displayCols[0];
+        let bestVal = -1;
+        for (const col of displayCols) {
+          const v = Number((s as any)[col]) || 0;
+          if (v > bestVal) { bestVal = v; bestCol = col; }
+        }
+        const optId = `opt-${bestCol}`;
+        const idx = optChildCounts[optId] || 0;
+        optChildCounts[optId] = idx + 1;
         leafNodes.push({
-          id: leafId, label: s.green_skill, kind: "leaf",
+          id: `leaf-${bestCol}-${idx}`, label: s.green_skill, kind: "leaf",
           color: getSkillSeverityColor(s.severity), radius: 10,
-          parentId: on.id, severity: s.severity, gap: s.gap,
+          parentId: optId, severity: s.severity, gap: s.gap,
           skillFamily: s.skill_family, greenSkillName: s.green_skill,
-          skillOptValue: skillOptVal,
+          skillOptValue: bestVal,
         });
       });
-    });
+    } else {
+      // Skill-level opt values are all 0 — distribute skills round-robin
+      skills.forEach((s, i) => {
+        const col = displayCols[i % displayCols.length];
+        const optId = `opt-${col}`;
+        const idx = optChildCounts[optId] || 0;
+        optChildCounts[optId] = idx + 1;
+        leafNodes.push({
+          id: `leaf-${col}-${idx}`, label: s.green_skill, kind: "leaf",
+          color: getSkillSeverityColor(s.severity), radius: 10,
+          parentId: optId, severity: s.severity, gap: s.gap,
+          skillFamily: s.skill_family, greenSkillName: s.green_skill,
+          skillOptValue: Number((department as any)[col]) || 0,
+        });
+      });
+    }
+
+    // Update child counts on opt nodes
+    optNodes.forEach(on => { on.childCount = optChildCounts[on.id] || 0; });
 
     // ── Assemble ──
     const allNodes = [hubNode, ...optNodes, ...leafNodes];
@@ -299,7 +331,8 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
   const critCount = skills.filter((s) => s.severity?.toLowerCase() === "critical").length;
   const modCount = skills.filter((s) => s.severity?.toLowerCase() === "moderate").length;
   const noGapCount = skills.filter((s) => s.severity?.toLowerCase() === "no gap" || s.severity?.toLowerCase() === "none").length;
-  const sevColor = getSeverityGlowColor(department.gap_severity);
+  const deptAvgOpt = computeAvgOpt(department);
+  const sevColor = optScoreColor(deptAvgOpt);
 
   const optFactors = OPT_COLUMNS.map((col) => ({
     key: col, label: formatOptLabel(col), value: Number((department as any)[col]) || 0,
@@ -421,10 +454,10 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: sevColor, boxShadow: `0 0 10px ${sevColor}66` }} />
                 <span className="text-white font-bold text-base">{deptLabel}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded font-medium" style={{ color: sevColor, backgroundColor: sevColor + "22" }}>
-                  {department.gap_severity}
+                  {(deptAvgOpt * 100).toFixed(0)}% opt
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-white/50 ml-auto">
-                  Score: {department.overall_score}
+                  {skills.length} skills
                 </span>
               </div>
               {directoryData && (
@@ -955,14 +988,14 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
                     <>
                       <p className="text-[10px] text-white/40 mb-1">Departments sharing skill dependencies or gaps with {deptLabel}.</p>
                       {connectedDepts.map((c, i) => {
-                        const otherColor = getSeverityGlowColor(c.dept!.gap_severity);
+                        const otherColor = optScoreColor(computeAvgOpt(c.dept!));
                         return (
                           <div key={i} className="bg-white/[0.03] rounded-lg p-3 border border-white/5">
                             <div className="flex items-center gap-2 mb-1.5">
                               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: otherColor }} />
                               <span className="text-white/80 text-[12px] font-medium">{c.dept!.label}</span>
                               <span className="text-[9px] px-1.5 py-0.5 rounded ml-auto" style={{ color: otherColor, backgroundColor: otherColor + "15" }}>
-                                {c.dept!.gap_severity}
+                                {(computeAvgOpt(c.dept!) * 100).toFixed(0)}%
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-[10px] text-white/50">

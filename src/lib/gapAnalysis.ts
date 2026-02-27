@@ -1,5 +1,5 @@
 import { Department, GreenSkill } from "./types";
-import { OPT_COLUMNS, computeAvgOpt } from "./utils";
+import { OPT_COLUMNS, computeAvgOpt, skillsForDept } from "./utils";
 import gsipData from "@/data/gsipData.json";
 
 // ─── Maturity Levels ────────────────────────────────────────────
@@ -33,7 +33,7 @@ export function computeSkillRiskScore(skill: GreenSkill): number {
 
 export function computeDeptRiskScore(dept: Department, skills: GreenSkill[]): number {
   if (skills.length === 0) return 0;
-  const deptSkills = skills.filter(s => s.department === dept.id);
+  const deptSkills = skillsForDept(skills, dept);
   if (deptSkills.length === 0) return 0;
   const totalRisk = deptSkills.reduce((sum, s) => sum + computeSkillRiskScore(s), 0);
   return totalRisk / deptSkills.length;
@@ -106,7 +106,7 @@ function buildLearningPathway(currentLevel: number, requiredLevel: number, skill
 }
 
 export function getPriorityActions(dept: Department, skills: GreenSkill[]): PriorityAction[] {
-  const deptSkills = skills.filter(s => s.department === dept.id);
+  const deptSkills = skillsForDept(skills, dept);
   const deptLabel = dept.label || dept.department;
 
   return deptSkills
