@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { Department, GreenSkill, ViewLevel } from "@/lib/types";
-import { getSeverityGlowColor, formatScore, OPT_COLUMNS, formatOptLabel, computeAvgOpt } from "@/lib/utils";
+import { getSkillSeverityColor, formatScore, OPT_COLUMNS, formatOptLabel, computeAvgOpt, optScoreColor, skillsForDept } from "@/lib/utils";
 import { getTopPrioritySkills, getQuickWins, getComplianceRiskSkills, computeSkillRiskScore, getMaturityLabel, computeDeptRiskScore } from "@/lib/gapAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import MethodologyModal from "./MethodologyModal";
@@ -89,8 +89,9 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
   const totalNoGap = departments.reduce((s, d) => s + (d.no_gap_count || 0), 0);
   const totalSkills = totalCritical + totalModerate + totalNoGap;
   const readiness = totalSkills > 0 ? ((totalNoGap / totalSkills) * 100).toFixed(0) : "0";
-  const totalScore = departments.reduce((s, d) => s + (d.overall_score || 0), 0);
-  const avgScore = departments.length > 0 ? (totalScore / departments.length).toFixed(0) : "0";
+  const avgOptAll = departments.length > 0
+    ? (departments.reduce((s, d) => s + computeAvgOpt(d), 0) / departments.length * 100).toFixed(0)
+    : "0";
 
   const highRiskDepts = [...departments]
     .map(d => ({ dept: d, riskScore: computeDeptRiskScore(d, allSkills) }))
@@ -158,8 +159,8 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
               <div className="text-[9px] text-white/40 mt-0.5">Readiness</div>
             </div>
             <div className="text-center p-2 rounded-lg bg-white/[0.03]">
-              <div className="text-xl font-bold text-white">{avgScore}</div>
-              <div className="text-[9px] text-white/40 mt-0.5">Avg Score</div>
+              <div className="text-xl font-bold text-white">{avgOptAll}<span className="text-xs text-white/40">%</span></div>
+              <div className="text-[9px] text-white/40 mt-0.5">Avg Opt</div>
             </div>
             <div className="text-center p-2 rounded-lg bg-white/[0.03]">
               <div className="text-xl font-bold text-white">{totalSkills}</div>
@@ -221,7 +222,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                           <span className="text-white/30">Risk: {(riskScore * 100).toFixed(0)}%</span>
                         </div>
                       </div>
-                      <span className="text-[10px] text-white/50 font-mono">{dept.overall_score}</span>
+                      <span className="text-[10px] font-mono" style={{ color: optScoreColor(computeAvgOpt(dept)) }}>{(computeAvgOpt(dept) * 100).toFixed(0)}%</span>
                     </div>
                   ))}
                 </div>
@@ -233,7 +234,8 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
               <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">All Departments</div>
               <div className="space-y-1">
                 {sortedDepts.map((dept) => {
-                  const color = getSeverityGlowColor(dept.gap_severity);
+                  const dAvg = computeAvgOpt(dept);
+                  const color = optScoreColor(dAvg);
                   const total = (dept.critical_gap_count || 0) + (dept.moderate_gap_count || 0) + (dept.no_gap_count || 0);
                   return (
                     <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02] border border-transparent">
@@ -241,7 +243,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] text-white/80 truncate font-medium">{dept.label}</span>
-                          <span className="text-[10px] text-white/50 ml-1">{dept.overall_score}</span>
+                          <span className="text-[10px] font-mono ml-1" style={{ color }}>{(dAvg * 100).toFixed(0)}%</span>
                         </div>
                         <div className="flex h-1 rounded-full overflow-hidden mt-0.5">
                           {total > 0 && (
@@ -254,7 +256,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                         </div>
                       </div>
                       <span className="text-[9px] font-medium px-1 py-0.5 rounded" style={{ color, backgroundColor: color + "15" }}>
-                        {dept.gap_severity?.slice(0, 4)}
+                        {(dAvg * 100).toFixed(0)}%
                       </span>
                     </div>
                   );
@@ -299,7 +301,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
             <p className="text-[9px] text-white/40 mb-3">Ranked by risk score — combining gap severity, sustainability impact, and priority level.</p>
             <div className="space-y-1.5">
               {topPrioritySkills.map(({ skill, riskScore }, i) => {
-                const color = getSeverityGlowColor(skill.severity === "No Gap" ? "healthy" : skill.severity);
+                const color = getSkillSeverityColor(skill.severity);
                 return (
                   <div key={skill.id} className="px-2 py-2 rounded-lg bg-white/[0.03] border border-white/5">
                     <div className="flex items-center gap-2 mb-1">
@@ -380,7 +382,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                   .map(d => ({ dept: d, risk: computeDeptRiskScore(d, allSkills) }))
                   .sort((a, b) => b.risk - a.risk)
                   .map(({ dept, risk }, i) => {
-                    const color = getSeverityGlowColor(dept.gap_severity);
+                    const color = optScoreColor(computeAvgOpt(dept));
                     return (
                       <div key={dept.id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.02]">
                         <span className="text-[9px] font-mono text-white/20 w-3">#{i + 1}</span>
@@ -403,37 +405,61 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
 
         {/* === SELECTED DEPARTMENT DETAIL === */}
         <AnimatePresence>
-          {selectedDept && (
+          {selectedDept && (() => {
+            const deptOptAvg = computeAvgOpt(selectedDept);
+            const dColor = optScoreColor(deptOptAvg);
+            // Derive skills ourselves in case currentSkills is empty due to id mismatch
+            const deptSkills = currentSkills.length > 0 ? currentSkills : skillsForDept(allSkills, selectedDept);
+            const dCritical = deptSkills.filter(s => s.severity?.toLowerCase() === "critical").length;
+            const dModerate = deptSkills.filter(s => s.severity?.toLowerCase() === "moderate").length;
+            const dNoGap = deptSkills.filter(s => {
+              const sev = s.severity?.toLowerCase();
+              return sev === "no gap" || sev === "none" || sev === "healthy";
+            }).length;
+            return (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
               <div className="px-5 py-3 border-b border-white/5 bg-white/[0.02]">
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getSeverityGlowColor(selectedDept.gap_severity), boxShadow: `0 0 6px ${getSeverityGlowColor(selectedDept.gap_severity)}66` }} />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dColor, boxShadow: `0 0 6px ${dColor}66` }} />
                   <span className="text-white font-semibold text-[13px]">{selectedDept.label}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   <div className="text-center p-1.5 rounded bg-white/[0.03]">
-                    <div className="text-sm font-bold text-white">{selectedDept.overall_score}</div>
-                    <div className="text-[8px] text-white/40">Score</div>
+                    <div className="text-sm font-bold" style={{ color: dColor }}>{(deptOptAvg * 100).toFixed(0)}%</div>
+                    <div className="text-[8px] text-white/40">Opt Score</div>
                   </div>
                   <div className="text-center p-1.5 rounded bg-white/[0.03]">
-                    <div className="text-sm font-bold" style={{ color: getSeverityGlowColor(selectedDept.gap_severity) }}>{selectedDept.gap_severity}</div>
-                    <div className="text-[8px] text-white/40">Severity</div>
+                    <div className="text-sm font-bold text-white">{deptSkills.length}</div>
+                    <div className="text-[8px] text-white/40">Skills</div>
                   </div>
                   <div className="text-center p-1.5 rounded bg-white/[0.03]">
                     <div className="text-sm font-bold text-white">{selectedDept.priority_level}</div>
                     <div className="text-[8px] text-white/40">Priority</div>
                   </div>
                 </div>
+                {/* Gap distribution for this dept */}
+                <div className="flex gap-3 text-[10px] mt-2">
+                  <span className="text-red-400">{dCritical} Critical</span>
+                  <span className="text-amber-400">{dModerate} Moderate</span>
+                  <span className="text-green-400">{dNoGap} No Gap</span>
+                </div>
+                {(dCritical + dModerate + dNoGap) > 0 && (
+                  <div className="flex h-2 rounded-full overflow-hidden mt-1">
+                    <div className="bg-red-500" style={{ width: `${(dCritical / deptSkills.length) * 100}%` }} />
+                    <div className="bg-amber-500" style={{ width: `${(dModerate / deptSkills.length) * 100}%` }} />
+                    <div className="bg-green-500" style={{ width: `${(dNoGap / deptSkills.length) * 100}%` }} />
+                  </div>
+                )}
               </div>
 
-              {currentSkills.length > 0 && (
+              {deptSkills.length > 0 && (
                 <div className="px-5 py-3 border-b border-white/5">
                   <div className="text-[9px] uppercase tracking-wider text-white/30 mb-2">
-                    {selectedDept.label} — {currentSkills.length} Skills
+                    {selectedDept.label} — {deptSkills.length} Skills
                   </div>
                   <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {currentSkills.map((skill) => {
-                      const skillColor = getSeverityGlowColor(skill.severity === "No Gap" ? "healthy" : skill.severity);
+                    {deptSkills.map((skill) => {
+                      const skillColor = getSkillSeverityColor(skill.severity);
                       return (
                         <div key={skill.id} className="flex items-center gap-2 text-[10px]">
                           <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: skillColor }} />
@@ -461,7 +487,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                       <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all" style={{
                           width: `${f.val * 100}%`,
-                          backgroundColor: f.val >= 0.4 ? "#22c55e" : f.val >= 0.2 ? "#f59e0b" : "#6b7280",
+                          backgroundColor: optScoreColor(f.val),
                         }} />
                       </div>
                     </div>
@@ -484,7 +510,8 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
                 </div>
               </div>
             </motion.div>
-          )}
+            );
+          })()}
         </AnimatePresence>
 
         {/* Methodology + Export */}
