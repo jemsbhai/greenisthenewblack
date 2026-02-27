@@ -188,6 +188,7 @@ export default function Home() {
               <NetworkGraph
                 departments={departments}
                 edges={edges}
+                allSkills={allSkills}
                 onNodeClick={handleDeptClick}
               />
             </motion.div>

@@ -20,9 +20,11 @@ export function getMaturityShort(level: number): string {
 
 // ─── Risk Scoring ────────────────────────────────────────────────
 // Weighted risk score combining gap severity, opt factor impact, and priority
-export function computeSkillRiskScore(skill: GreenSkill): number {
+export function computeSkillRiskScore(skill: GreenSkill, deptOptFallback?: number): number {
   const gapWeight = skill.gap >= 2 ? 1.0 : skill.gap === 1 ? 0.5 : 0;
-  const optImpact = computeAvgOpt(skill); // 0-1, higher = more impact
+  // Use skill-level opt if available, otherwise fall back to dept-level opt
+  const skillOpt = computeAvgOpt(skill);
+  const optImpact = skillOpt > 0 ? skillOpt : (deptOptFallback ?? 0);
   const priorityWeight =
     skill.priority_level?.toLowerCase() === "critical" ? 1.0 :
     skill.priority_level?.toLowerCase() === "high" ? 0.75 :
@@ -35,7 +37,8 @@ export function computeDeptRiskScore(dept: Department, skills: GreenSkill[]): nu
   if (skills.length === 0) return 0;
   const deptSkills = skillsForDept(skills, dept);
   if (deptSkills.length === 0) return 0;
-  const totalRisk = deptSkills.reduce((sum, s) => sum + computeSkillRiskScore(s), 0);
+  const deptOpt = computeAvgOpt(dept);
+  const totalRisk = deptSkills.reduce((sum, s) => sum + computeSkillRiskScore(s, deptOpt), 0);
   return totalRisk / deptSkills.length;
 }
 
@@ -108,10 +111,11 @@ function buildLearningPathway(currentLevel: number, requiredLevel: number, skill
 export function getPriorityActions(dept: Department, skills: GreenSkill[]): PriorityAction[] {
   const deptSkills = skillsForDept(skills, dept);
   const deptLabel = dept.label || dept.department;
+  const deptOpt = computeAvgOpt(dept);
 
   return deptSkills
     .map(skill => {
-      const riskScore = computeSkillRiskScore(skill);
+      const riskScore = computeSkillRiskScore(skill, deptOpt);
       const actionData = matchSkillAction(deptLabel, skill.green_skill);
       const currentMaturity = getMaturityLabel(skill.current_level);
       const requiredMaturity = getMaturityLabel(skill.required_level);
@@ -205,18 +209,42 @@ export function getDeptDirectoryData(deptLabel: string): DeptDirectoryData | nul
 }
 
 // ─── Organisation-wide analytics ─────────────────────────────────
-export function getTopPrioritySkills(skills: GreenSkill[], limit = 10): Array<{ skill: GreenSkill; riskScore: number }> {
+export function getTopPrioritySkills(skills: GreenSkill[], limit = 10, departments?: Department[]): Array<{ skill: GreenSkill; riskScore: number }> {
+  // Build a dept opt lookup so skill risk scores use dept-level opt as fallback
+  const deptOptMap = new Map<string, number>();
+  if (departments) {
+    for (const d of departments) {
+      const opt = computeAvgOpt(d);
+      deptOptMap.set(d.id, opt);
+      deptOptMap.set(d.department, opt);
+      if (d.label) deptOptMap.set(d.label, opt);
+    }
+  }
   return skills
-    .map(s => ({ skill: s, riskScore: computeSkillRiskScore(s) }))
+    .map(s => ({ skill: s, riskScore: computeSkillRiskScore(s, deptOptMap.get(s.department)) }))
     .sort((a, b) => b.riskScore - a.riskScore)
     .slice(0, limit);
 }
 
-export function getQuickWins(skills: GreenSkill[]): GreenSkill[] {
+export function getQuickWins(skills: GreenSkill[], departments?: Department[]): GreenSkill[] {
+  // Build dept opt lookup for fallback
+  const deptOptMap = new Map<string, number>();
+  if (departments) {
+    for (const d of departments) {
+      const opt = computeAvgOpt(d);
+      deptOptMap.set(d.id, opt);
+      deptOptMap.set(d.department, opt);
+      if (d.label) deptOptMap.set(d.label, opt);
+    }
+  }
+  const getOpt = (s: GreenSkill) => {
+    const skillOpt = computeAvgOpt(s);
+    return skillOpt > 0 ? skillOpt : (deptOptMap.get(s.department) ?? 0);
+  };
   // Moderate gaps with high opt impact — easy to close, high reward
   return skills
-    .filter(s => s.gap === 1 && computeAvgOpt(s) >= 0.3)
-    .sort((a, b) => computeAvgOpt(b) - computeAvgOpt(a));
+    .filter(s => s.gap === 1 && getOpt(s) >= 0.3)
+    .sort((a, b) => getOpt(b) - getOpt(a));
 }
 
 export function getComplianceRiskSkills(skills: GreenSkill[]): GreenSkill[] {
