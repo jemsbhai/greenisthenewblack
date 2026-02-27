@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a1a;
+  --foreground: #ededed;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Glow effects */
+.glow-red {
+  filter: drop-shadow(0 0 8px #ef4444) drop-shadow(0 0 20px rgba(239, 68, 68, 0.4));
+}
+.glow-amber {
+  filter: drop-shadow(0 0 8px #f59e0b) drop-shadow(0 0 20px rgba(245, 158, 11, 0.4));
+}
+.glow-green {
+  filter: drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 20px rgba(34, 197, 94, 0.4));
+}
+
+/* Animated edge */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.edge-animated {
+  stroke-dasharray: 8 4;
+  stroke-dashoffset: 24;
+  animation: dash-flow 3s linear infinite;
+}
+
+/* Radar chart custom */
+.recharts-polar-grid-angle line {
+  stroke: rgba(255, 255, 255, 0.1) !important;
+}
+.recharts-polar-grid-concentric path {
+  stroke: rgba(255, 255, 255, 0.08) !important;
+}
