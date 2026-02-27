@@ -59,19 +59,24 @@ export function computeAvgOpt(row: any): number {
   return count > 0 ? sum / count : 0;
 }
 
-export function getGlowColor(avgOpt: number): string {
-  if (avgOpt < 0.25) return "#ef4444"; // red
-  if (avgOpt <= 0.5) return "#f59e0b"; // amber
-  return "#22c55e"; // green
+/** Color based on gap_severity from the DB — this is the source of truth */
+export function getSeverityGlowColor(severity: string): string {
+  switch (severity?.toLowerCase()) {
+    case "critical":
+      return "#ef4444";
+    case "moderate":
+      return "#f59e0b";
+    case "healthy":
+    case "no gap":
+    case "none":
+      return "#22c55e";
+    default:
+      return "#6b7280";
+  }
 }
 
-export function getGlowClass(avgOpt: number): string {
-  if (avgOpt < 0.25) return "glow-red";
-  if (avgOpt <= 0.5) return "glow-amber";
-  return "glow-green";
-}
-
-export function getSeverityColor(severity: string): string {
+/** Color for skill-level severity */
+export function getSkillSeverityColor(severity: string): string {
   switch (severity?.toLowerCase()) {
     case "critical":
       return "#ef4444";
@@ -85,6 +90,18 @@ export function getSeverityColor(severity: string): string {
   }
 }
 
+/** For backwards compat — maps opt avg to color (used in radar/detail views) */
+export function getOptColor(avgOpt: number): string {
+  if (avgOpt < 0.2) return "#6b7280";
+  if (avgOpt < 0.4) return "#f59e0b";
+  return "#22c55e";
+}
+
 export function formatOptLabel(key: string): string {
   return OPT_LABELS[key] || key.replace("opt_", "").replace(/_/g, " ");
+}
+
+export function formatScore(val: number | null | undefined): string {
+  if (val === null || val === undefined) return "—";
+  return (val * 100).toFixed(0) + "%";
 }

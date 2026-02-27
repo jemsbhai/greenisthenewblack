@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { GreenSkill } from "@/lib/types";
 import {
   computeAvgOpt,
-  getGlowColor,
-  getSeverityColor,
+  getOptColor,
+  getSkillSeverityColor,
   OPT_COLUMNS,
   formatOptLabel,
 } from "@/lib/utils";
@@ -22,8 +22,8 @@ export default function SkillDetailDrawer({
   onClose,
 }: SkillDetailDrawerProps) {
   const avgOpt = computeAvgOpt(skill);
-  const glowColor = getGlowColor(avgOpt);
-  const sevColor = getSeverityColor(skill.severity);
+  const glowColor = getOptColor(avgOpt);
+  const sevColor = getSkillSeverityColor(skill.severity);
   const levelPercent =
     skill.required_level > 0
       ? (skill.current_level / skill.required_level) * 100
