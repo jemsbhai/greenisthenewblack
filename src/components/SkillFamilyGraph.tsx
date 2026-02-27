@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback, useState, useMemo } from "react";
 import * as d3 from "d3";
 import { Department, DepartmentEdge, GreenSkill, SkillFamily } from "@/lib/types";
 import { getSeverityGlowColor, getSkillSeverityColor, OPT_COLUMNS, formatOptLabel, formatScore, computeAvgOpt } from "@/lib/utils";
@@ -50,13 +50,13 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
   const [assessmentTheme, setAssessmentTheme] = useState<string | null>(null);
 
   const deptLabel = department.label || department.department;
-  const directoryData = getDeptDirectoryData(deptLabel);
-  const priorityActions = getPriorityActions(department, skills);
-  const assessments = getDeptAssessments(deptLabel);
-  const sectors = getAllSectors();
-  const sectorPriorities = getDeptSectorPriorities(deptLabel);
-  const skillsMap = getDeptSkillsMap(deptLabel);
-  const deptActions = getDeptActions(deptLabel);
+  const directoryData = useMemo(() => getDeptDirectoryData(deptLabel), [deptLabel]);
+  const priorityActions = useMemo(() => getPriorityActions(department, skills), [department, skills]);
+  const assessments = useMemo(() => getDeptAssessments(deptLabel), [deptLabel]);
+  const sectors = useMemo(() => getAllSectors(), []);
+  const sectorPriorities = useMemo(() => getDeptSectorPriorities(deptLabel), [deptLabel]);
+  const skillsMap = useMemo(() => getDeptSkillsMap(deptLabel), [deptLabel]);
+  const deptActions = useMemo(() => getDeptActions(deptLabel), [deptLabel]);
 
   const toggleExpanded = (id: string) => {
     setExpandedItems(prev => {
@@ -147,12 +147,14 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       .attr("stroke", "rgba(255,255,255,0.2)").attr("stroke-width", 1.5).attr("filter", "url(#sf-glow-filter)")
       .attr("cursor", (d) => d.isHub ? "default" : "pointer")
       .on("mouseover", function (event, d) {
-        if (!d.isHub) { d3.select(this).attr("opacity", 1).attr("stroke-width", 3); }
+        if (d.isHub) return;
+        d3.select(this).attr("opacity", 1).attr("stroke-width", 3);
         const [x, y] = d3.pointer(event, svgRef.current);
         setTooltip({ node: d, x, y });
       })
       .on("mouseout", function (_, d) {
-        if (!d.isHub) { d3.select(this).attr("opacity", 0.9).attr("stroke-width", 1.5); }
+        if (d.isHub) return;
+        d3.select(this).attr("opacity", 0.9).attr("stroke-width", 1.5);
         setTooltip(null);
       })
       .on("click", (_, d) => {
