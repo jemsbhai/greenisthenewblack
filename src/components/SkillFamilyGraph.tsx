@@ -21,7 +21,7 @@ interface SkillFamilyGraphProps {
   onBack: () => void;
 }
 
-type NodeKind = "hub" | "maturity" | "family" | "leaf";
+type NodeKind = "hub" | "opt" | "leaf";
 
 interface GraphNode extends d3.SimulationNodeDatum {
   id: string;
@@ -29,36 +29,28 @@ interface GraphNode extends d3.SimulationNodeDatum {
   kind: NodeKind;
   color: string;
   radius: number;
-  level?: number;
-  description?: string;
-  // maturity node fields
-  techSkill?: string;
-  knowSkill?: string;
-  valueSkill?: string;
-  attitudeSkill?: string;
-  skillCount?: number;
-  // family node fields
-  familyType?: string; // "Technical" | "Knowledge" | "Values" | "Attitudes"
-  familySkillName?: string; // e.g. "Life Cycle Analysis"
+  // hub fields
+  avgOptScore?: number;
+  // opt metric node fields
+  optKey?: string;
+  optValue?: number;
+  optSeverity?: string;
   childCount?: number;
-  avgOpt?: number;
-  aggregateSeverity?: string;
   parentId?: string;
   // leaf skill node fields
   severity?: string;
   gap?: number;
   skillFamily?: string;
   greenSkillName?: string;
+  skillOptValue?: number;
 }
 
-const MATURITY_COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#22c55e"];
-const FAMILY_COLORS: Record<string, string> = {
-  Technical: "#3b82f6",
-  Knowledgeable: "#8b5cf6",
-  Knowledge: "#8b5cf6",
-  Values: "#f59e0b",
-  Attitudes: "#ec4899",
-};
+/** Map a 0-1 opt value to severity + color */
+function optSeverity(val: number): { severity: string; color: string } {
+  if (val >= 0.4) return { severity: "high", color: "#22c55e" };
+  if (val >= 0.2) return { severity: "moderate", color: "#f59e0b" };
+  return { severity: "low", color: "#ef4444" };
+}
 
 type DrawerTab = "overview" | "directory" | "actions" | "maturity" | "assessments" | "sectors" | "factors" | "connections";
 
@@ -89,7 +81,8 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     });
   };
 
-  // Build maturity-level nodes with skill family intermediates
+  // Build optimisation-metric-centric graph:
+  //   Hub (dept, avg opt score) → 16 opt metric nodes (G/A/R) → leaf skills that contribute
   const buildGraph = useCallback(() => {
     if (!svgRef.current) return;
     const svg = d3.select(svgRef.current);
@@ -97,120 +90,59 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     const width = svgRef.current.clientWidth;
     const height = svgRef.current.clientHeight;
 
-    // ── Hub node ──
-    const hubColor = getSeverityGlowColor(department.gap_severity);
-    const hubNode: GraphNode = { id: "hub", label: deptLabel, kind: "hub", color: hubColor, radius: 42 };
+    // ── Compute department avg opt score (average of all 16 opt columns) ──
+    const deptAvgOpt = computeAvgOpt(department);
+    const hubSev = optSeverity(deptAvgOpt);
+    const hubNode: GraphNode = {
+      id: "hub", label: deptLabel, kind: "hub",
+      color: hubSev.color, radius: 44, avgOptScore: deptAvgOpt,
+    };
 
-    // ── Maturity persona nodes ──
-    const maturityNodes: GraphNode[] = (directoryData?.maturityLevels || []).map((ml, i) => ({
-      id: `maturity-${i}`,
-      label: ml.level,
-      kind: "maturity" as NodeKind,
-      color: MATURITY_COLORS[i],
-      radius: 30,
-      level: i + 1,
-      description: ml.description,
-      techSkill: ml.technicalSkill,
-      knowSkill: ml.knowledgeSkill,
-      valueSkill: ml.value,
-      attitudeSkill: ml.attitude,
-    }));
-    // Fallback
-    if (maturityNodes.length === 0) {
-      for (let i = 0; i < 4; i++) {
-        const ml = MATURITY_LEVELS[i];
-        maturityNodes.push({
-          id: `maturity-${i}`, label: ml.label, kind: "maturity", color: MATURITY_COLORS[i],
-          radius: 30, level: i + 1, description: ml.description,
-        });
-      }
-    }
-
-    // ── Skill family intermediate nodes ──
-    // For each maturity level, create up to 4 family nodes (Tech, Knowledge, Values, Attitudes)
-    const familyNodes: GraphNode[] = [];
-    const FAMILY_KEYS: { key: string; matField: "techSkill" | "knowSkill" | "valueSkill" | "attitudeSkill"; dbFamily: string }[] = [
-      { key: "Technical", matField: "techSkill", dbFamily: "Technical" },
-      { key: "Knowledge", matField: "knowSkill", dbFamily: "Knowledgeable" },
-      { key: "Values", matField: "valueSkill", dbFamily: "Values" },
-      { key: "Attitudes", matField: "attitudeSkill", dbFamily: "Attitudes" },
-    ];
-
-    maturityNodes.forEach((mn) => {
-      FAMILY_KEYS.forEach((fk) => {
-        const familySkillName = (mn as any)[fk.matField] as string | undefined;
-        if (!familySkillName) return;
-        const childSkills = skills.filter(s => s.required_level === mn.level && s.skill_family === fk.dbFamily);
-        // Aggregate severity: if any critical → critical, else if any moderate → moderate, else healthy
-        const hasCritical = childSkills.some(s => s.severity?.toLowerCase() === "critical");
-        const hasModerate = childSkills.some(s => s.severity?.toLowerCase() === "moderate");
-        const aggSev = hasCritical ? "critical" : hasModerate ? "moderate" : "no gap";
-        const aggColor = getSkillSeverityColor(aggSev);
-        // Average opt across child skills
-        const avgOpt = childSkills.length > 0
-          ? childSkills.reduce((sum, s) => sum + computeAvgOpt(s), 0) / childSkills.length
-          : 0;
-
-        familyNodes.push({
-          id: `fam-${mn.id}-${fk.key}`,
-          label: familySkillName,
-          kind: "family",
-          color: aggColor,
-          radius: 20,
-          level: mn.level,
-          parentId: mn.id,
-          familyType: fk.key,
-          familySkillName,
-          childCount: childSkills.length,
-          avgOpt,
-          aggregateSeverity: aggSev,
-          description: `${fk.key} skill at Level ${mn.level}`,
-        });
-      });
+    // ── 16 Opt metric nodes — each colored G/A/R by its actual value ──
+    const optNodes: GraphNode[] = OPT_COLUMNS.map((col) => {
+      const val = Number((department as any)[col]) || 0;
+      const sev = optSeverity(val);
+      // Find skills that have non-zero value for this opt column
+      const contributing = skills.filter(s => Number((s as any)[col]) > 0);
+      return {
+        id: `opt-${col}`, label: formatOptLabel(col), kind: "opt" as NodeKind,
+        color: sev.color, radius: 22, optKey: col, optValue: val, optSeverity: sev.severity,
+        childCount: contributing.length,
+      };
     });
 
-    // ── Leaf green skill nodes ──
+    // ── Leaf nodes: for each opt metric, the skills that contribute to it ──
     const leafNodes: GraphNode[] = [];
-    familyNodes.forEach((fn) => {
-      const fk = FAMILY_KEYS.find(f => f.key === fn.familyType);
-      if (!fk) return;
-      const childSkills = skills.filter(s => s.required_level === fn.level && s.skill_family === fk.dbFamily);
-      childSkills.forEach((s, j) => {
+    const seenLeaves = new Set<string>(); // avoid duplicate skill nodes per opt metric
+    optNodes.forEach((on) => {
+      const col = on.optKey!;
+      const contributing = skills.filter(s => Number((s as any)[col]) > 0);
+      contributing.forEach((s, j) => {
+        const leafId = `leaf-${col}-${j}`;
+        if (seenLeaves.has(leafId)) return;
+        seenLeaves.add(leafId);
+        const skillOptVal = Number((s as any)[col]) || 0;
+        const skillSev = optSeverity(skillOptVal);
         leafNodes.push({
-          id: `leaf-${fn.id}-${j}`,
-          label: s.green_skill,
-          kind: "leaf",
-          color: getSkillSeverityColor(s.severity),
-          radius: 10,
-          level: fn.level,
-          parentId: fn.id,
-          severity: s.severity,
-          gap: s.gap,
-          skillFamily: s.skill_family,
-          greenSkillName: s.green_skill,
-          avgOpt: computeAvgOpt(s),
+          id: leafId, label: s.green_skill, kind: "leaf",
+          color: getSkillSeverityColor(s.severity), radius: 10,
+          parentId: on.id, severity: s.severity, gap: s.gap,
+          skillFamily: s.skill_family, greenSkillName: s.green_skill,
+          skillOptValue: skillOptVal,
         });
       });
     });
 
-    // ── Assemble all nodes & links ──
-    const allNodes = [hubNode, ...maturityNodes, ...familyNodes, ...leafNodes];
+    // ── Assemble ──
+    const allNodes = [hubNode, ...optNodes, ...leafNodes];
     const links: { source: string; target: string }[] = [];
-    // Hub → maturity
-    maturityNodes.forEach(mn => links.push({ source: "hub", target: mn.id }));
-    // Chain maturity levels
-    for (let i = 0; i < maturityNodes.length - 1; i++) {
-      links.push({ source: maturityNodes[i].id, target: maturityNodes[i + 1].id });
-    }
-    // Maturity → family
-    familyNodes.forEach(fn => links.push({ source: fn.parentId!, target: fn.id }));
-    // Family → leaves
+    optNodes.forEach(on => links.push({ source: "hub", target: on.id }));
     leafNodes.forEach(ln => links.push({ source: ln.parentId!, target: ln.id }));
 
     // ── SVG defs ──
     const defs = svg.append("defs");
     allNodes.forEach((node) => {
-      const glowOpacity = node.kind === "leaf" ? 0.5 : node.kind === "family" ? 0.6 : 0.8;
+      const glowOpacity = node.kind === "leaf" ? 0.5 : node.kind === "opt" ? 0.6 : 0.8;
       const grad = defs.append("radialGradient").attr("id", `sfglow-${node.id}`).attr("cx", "50%").attr("cy", "50%").attr("r", "50%");
       grad.append("stop").attr("offset", "0%").attr("stop-color", node.color).attr("stop-opacity", glowOpacity);
       grad.append("stop").attr("offset", "60%").attr("stop-color", node.color).attr("stop-opacity", glowOpacity * 0.3);
@@ -228,87 +160,76 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     lMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
     const container = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
-    const coreNodes = [hubNode, ...maturityNodes];
 
     // ── Links ──
     const linkGroup = container.append("g").selectAll("line").data(links).enter().append("line")
       .attr("stroke", (d) => {
         const tgt = allNodes.find(n => n.id === (typeof d.target === "string" ? d.target : (d.target as any).id));
         if (tgt?.kind === "leaf") return tgt.color + "30";
-        if (tgt?.kind === "family") return tgt.color + "40";
-        return "rgba(255,255,255,0.12)";
+        return tgt?.color ? tgt.color + "50" : "rgba(255,255,255,0.12)";
       })
       .attr("stroke-width", (d) => {
         const tgt = allNodes.find(n => n.id === (typeof d.target === "string" ? d.target : (d.target as any).id));
-        return tgt?.kind === "leaf" ? 0.8 : tgt?.kind === "family" ? 1.2 : 2;
+        return tgt?.kind === "leaf" ? 0.8 : 1.5;
       });
 
-    // ── Glow + circles: hub & maturity ──
-    const glowGroup = container.append("g").selectAll("circle").data(coreNodes).enter().append("circle")
-      .attr("r", (d) => d.radius * 2).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.5).style("pointer-events", "none");
+    // ── Hub node ──
+    const hubGlow = container.append("circle")
+      .attr("r", hubNode.radius * 2.2).attr("fill", `url(#sfglow-${hubNode.id})`).attr("opacity", 0.5).style("pointer-events", "none");
+    const hubCircle = container.append("circle")
+      .attr("r", hubNode.radius).attr("fill", hubNode.color).attr("opacity", 0.9)
+      .attr("stroke", "rgba(255,255,255,0.25)").attr("stroke-width", 2).attr("filter", "url(#sf-glow-filter)");
+    // Hub text: avg opt score (as %)
+    const hubMainText = container.append("text")
+      .attr("text-anchor", "middle").attr("dy", "-0.3em").attr("fill", "white")
+      .attr("font-size", "14px").attr("font-weight", "700").style("pointer-events", "none")
+      .text(`${(deptAvgOpt * 100).toFixed(0)}%`);
+    const hubSubText = container.append("text")
+      .attr("text-anchor", "middle").attr("dy", "1em").attr("fill", "rgba(255,255,255,0.45)")
+      .attr("font-size", "7px").style("pointer-events", "none").text("avg opt score");
+    const hubLabelText = container.append("text")
+      .attr("text-anchor", "middle").attr("dy", hubNode.radius + 14)
+      .attr("fill", "rgba(255,255,255,0.85)").attr("font-size", "11px").attr("font-weight", "600")
+      .style("pointer-events", "none").text(deptLabel);
 
-    const nodeGroup = container.append("g").selectAll("circle").data(coreNodes).enter().append("circle")
+    // ── Opt metric nodes ──
+    const optGlowGroup = container.append("g").selectAll("circle").data(optNodes).enter().append("circle")
+      .attr("r", (d) => d.radius * 1.7).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.45).style("pointer-events", "none");
+
+    const optNodeGroup = container.append("g").selectAll("circle").data(optNodes).enter().append("circle")
       .attr("r", (d) => d.radius).attr("fill", (d) => d.color).attr("opacity", 0.9)
-      .attr("stroke", "rgba(255,255,255,0.2)").attr("stroke-width", 1.5).attr("filter", "url(#sf-glow-filter)")
-      .attr("cursor", (d) => d.kind === "hub" ? "default" : "pointer")
+      .attr("stroke", "rgba(255,255,255,0.15)").attr("stroke-width", 1.5).attr("filter", "url(#sf-glow-filter)")
+      .attr("cursor", "pointer")
       .on("mouseover", function (event, d) {
-        if (d.kind !== "hub") d3.select(this).attr("opacity", 1).attr("stroke-width", 3);
+        d3.select(this).attr("opacity", 1).attr("stroke-width", 3).attr("stroke", "rgba(255,255,255,0.5)");
         const [x, y] = d3.pointer(event, svgRef.current);
         setTooltip({ node: d, x, y });
       })
-      .on("mouseout", function (_, d) {
-        if (d.kind !== "hub") d3.select(this).attr("opacity", 0.9).attr("stroke-width", 1.5);
+      .on("mouseout", function () {
+        d3.select(this).attr("opacity", 0.9).attr("stroke-width", 1.5).attr("stroke", "rgba(255,255,255,0.15)");
         setTooltip(null);
       })
-      .on("click", (_, d) => {
-        if (d.kind === "maturity" && d.level) {
-          setActiveTab("maturity");
-          setDrawerOpen(true);
-          toggleExpanded(`maturity-${d.level}`);
-        }
-      });
+      .on("click", (_, d) => { setActiveTab("factors"); setDrawerOpen(true); });
 
-    // ── Family nodes (intermediate skill family circles) ──
-    const famGlowGroup = container.append("g").selectAll("circle").data(familyNodes).enter().append("circle")
-      .attr("r", (d) => d.radius * 1.6).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.4).style("pointer-events", "none");
-
-    const famNodeGroup = container.append("g").selectAll("circle").data(familyNodes).enter().append("circle")
-      .attr("r", (d) => d.radius).attr("fill", (d) => d.color).attr("opacity", 0.9)
-      .attr("stroke", (d) => FAMILY_COLORS[d.familyType || ""] || d.color).attr("stroke-width", 2).attr("stroke-opacity", 0.5)
-      .attr("filter", "url(#sf-glow-filter)").attr("cursor", "pointer")
-      .on("mouseover", function (event, d) {
-        d3.select(this).attr("opacity", 1).attr("stroke-width", 3).attr("stroke-opacity", 0.9);
-        const [x, y] = d3.pointer(event, svgRef.current);
-        setTooltip({ node: d, x, y });
-      })
-      .on("mouseout", function (_, d) {
-        d3.select(this).attr("opacity", 0.9).attr("stroke-width", 2).attr("stroke-opacity", 0.5);
-        setTooltip(null);
-      })
-      .on("click", (_, d) => {
-        setActiveTab("directory");
-        setDrawerOpen(true);
-      });
-
-    // Family node inner text (family initial)
-    const famInnerText = container.append("g").selectAll("text").data(familyNodes).enter().append("text")
+    // Opt % inside node
+    const optInnerText = container.append("g").selectAll("text").data(optNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white")
       .attr("font-size", "9px").attr("font-weight", "700").style("pointer-events", "none")
-      .text((d) => (d.familyType || "")[0]); // T, K, V, A
+      .text((d) => `${((d.optValue || 0) * 100).toFixed(0)}%`);
 
-    // Family node labels below
-    const famLabelGroup = container.append("g").selectAll("text").data(familyNodes).enter().append("text")
+    // Opt label below node
+    const optLabelGroup = container.append("g").selectAll("text").data(optNodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 11)
       .attr("fill", (d) => d.color).attr("font-size", "7px").attr("font-weight", "600")
       .style("pointer-events", "none").attr("opacity", 0.85)
       .text((d) => {
-        const name = d.familySkillName || d.label;
-        return name.length > 20 ? name.slice(0, 18) + "…" : name;
+        const name = d.label;
+        return name.length > 18 ? name.slice(0, 16) + "…" : name;
       });
 
     // ── Leaf skill nodes ──
     const leafGlowGroup = container.append("g").selectAll("circle").data(leafNodes).enter().append("circle")
-      .attr("r", (d) => d.radius * 1.6).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.3).style("pointer-events", "none");
+      .attr("r", (d) => d.radius * 1.5).attr("fill", (d) => `url(#sfglow-${d.id})`).attr("opacity", 0.3).style("pointer-events", "none");
 
     const leafNodeGroup = container.append("g").selectAll("circle").data(leafNodes).enter().append("circle")
       .attr("r", (d) => d.radius).attr("fill", (d) => d.color).attr("opacity", 0.85)
@@ -333,64 +254,45 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
         return name.length > 14 ? name.slice(0, 12) + "…" : name;
       });
 
-    // ── Core text layers ──
-    const countText = container.append("g").selectAll("text").data(coreNodes).enter().append("text")
-      .attr("text-anchor", "middle").attr("dy", d => d.kind === "hub" ? "-0.2em" : "0.35em").attr("fill", "white")
-      .attr("font-size", (d) => d.kind === "hub" ? "12px" : "14px").attr("font-weight", "700").style("pointer-events", "none")
-      .text((d) => d.kind === "hub" ? department.overall_score : (d.level || ""));
-
-    const hubSub = container.append("g").selectAll("text").data([hubNode]).enter().append("text")
-      .attr("text-anchor", "middle").attr("dy", "1em").attr("fill", "rgba(255,255,255,0.5)")
-      .attr("font-size", "8px").style("pointer-events", "none").text("score");
-
-    const labelText = container.append("g").selectAll("text").data(coreNodes).enter().append("text")
-      .attr("text-anchor", "middle").attr("dy", (d) => d.radius + 14)
-      .attr("fill", "rgba(255,255,255,0.85)").attr("font-size", (d) => d.kind === "hub" ? "12px" : "9px")
-      .attr("font-weight", "600").style("pointer-events", "none")
-      .text((d) => d.kind === "hub" ? deptLabel : d.label);
-
     // ── Force simulation ──
     const simulation = d3.forceSimulation<GraphNode>(allNodes)
       .force("link", d3.forceLink(links).id((d: any) => d.id)
         .distance((d: any) => {
           const tgt = typeof d.target === "object" ? d.target : allNodes.find(n => n.id === d.target);
-          if (tgt?.kind === "leaf") return 45;
-          if (tgt?.kind === "family") return 75;
-          return 140;
+          if (tgt?.kind === "leaf") return 50;
+          return 160;
         })
         .strength((d: any) => {
           const tgt = typeof d.target === "object" ? d.target : allNodes.find(n => n.id === d.target);
-          if (tgt?.kind === "leaf") return 1.0;
-          if (tgt?.kind === "family") return 0.9;
-          return 0.5;
+          return tgt?.kind === "leaf" ? 1.0 : 0.6;
         }))
       .force("charge", d3.forceManyBody<GraphNode>().strength((d) =>
-        d.kind === "leaf" ? -30 : d.kind === "family" ? -100 : -350
+        d.kind === "leaf" ? -25 : d.kind === "opt" ? -180 : -500
       ))
       .force("center", d3.forceCenter(0, 0).strength(0.04))
       .force("collision", d3.forceCollide<GraphNode>().radius((d) =>
-        d.kind === "leaf" ? d.radius + 4 : d.kind === "family" ? d.radius + 10 : d.radius + 25
+        d.kind === "leaf" ? d.radius + 4 : d.kind === "opt" ? d.radius + 14 : d.radius + 30
       ))
       .on("tick", () => {
         hubNode.x = 0; hubNode.y = 0;
         linkGroup.attr("x1", (d: any) => d.source.x).attr("y1", (d: any) => d.source.y)
           .attr("x2", (d: any) => d.target.x).attr("y2", (d: any) => d.target.y);
-        glowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-        nodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-        famGlowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-        famNodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-        famInnerText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
-        famLabelGroup.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        hubGlow.attr("cx", hubNode.x!).attr("cy", hubNode.y!);
+        hubCircle.attr("cx", hubNode.x!).attr("cy", hubNode.y!);
+        hubMainText.attr("x", hubNode.x!).attr("y", hubNode.y!);
+        hubSubText.attr("x", hubNode.x!).attr("y", hubNode.y!);
+        hubLabelText.attr("x", hubNode.x!).attr("y", hubNode.y!);
+        optGlowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        optNodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+        optInnerText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+        optLabelGroup.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
         leafGlowGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
         leafNodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
         leafLabelGroup.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
-        countText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
-        hubSub.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
-        labelText.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
       });
 
     return () => { simulation.stop(); };
-  }, [department, skills, deptLabel, directoryData]);
+  }, [department, skills, deptLabel]);
 
   useEffect(() => { const cleanup = buildGraph(); return () => { cleanup?.(); }; }, [buildGraph]);
 
@@ -443,12 +345,9 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
 
         {/* Mini legend */}
         <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3 text-[9px] text-white/40 bg-[#0c0c24]/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/5">
-          {MATURITY_COLORS.map((c, i) => (
-            <div key={i} className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: c }} />
-              <span>L{i + 1}</span>
-            </div>
-          ))}
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-green-500" /><span>High</span></div>
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500" /><span>Moderate</span></div>
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500" /><span>Low</span></div>
           <span className="text-white/20 mx-1">|</span>
           <span className="text-red-400">{critCount}C</span>
           <span className="text-amber-400">{modCount}M</span>
@@ -462,7 +361,32 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
               className="absolute pointer-events-none z-50 bg-[#0f0f2e]/95 backdrop-blur-sm border border-white/10 rounded-lg px-4 py-3 shadow-xl"
               style={{ left: tooltip.x + 15, top: tooltip.y - 10, maxWidth: 340 }}>
-              {tooltip.node.kind === "leaf" ? (
+              {tooltip.node.kind === "opt" ? (
+                <>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: tooltip.node.color }} />
+                    <span className="text-white font-semibold text-sm">{tooltip.node.label}</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span className="text-[9px] text-white/30">Score</span>
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{
+                        width: `${(tooltip.node.optValue || 0) * 100}%`,
+                        backgroundColor: tooltip.node.color,
+                      }} />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold" style={{ color: tooltip.node.color }}>
+                      {((tooltip.node.optValue || 0) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] mt-1.5">
+                    <span style={{ color: tooltip.node.color }} className="font-semibold capitalize">{tooltip.node.optSeverity} impact</span>
+                    <span className="text-white/30">|</span>
+                    <span className="text-white/40">{tooltip.node.childCount} contributing skill{tooltip.node.childCount !== 1 ? "s" : ""}</span>
+                  </div>
+                  <div className="text-[9px] text-white/25 mt-1">Click to view all opt factors</div>
+                </>
+              ) : (
                 <>
                   <div className="flex items-center gap-2 mb-1">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tooltip.node.color }} />
@@ -473,49 +397,9 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
                     <span className="text-white/40">Gap: {tooltip.node.gap ?? "—"}</span>
                     <span className="text-white/40">{tooltip.node.skillFamily}</span>
                   </div>
-                  {tooltip.node.avgOpt !== undefined && (
-                    <div className="text-[10px] text-white/40 mt-1">Opt impact: {(tooltip.node.avgOpt * 100).toFixed(0)}%</div>
+                  {tooltip.node.skillOptValue !== undefined && (
+                    <div className="text-[10px] text-white/40 mt-1">Metric contribution: {(tooltip.node.skillOptValue * 100).toFixed(0)}%</div>
                   )}
-                </>
-              ) : tooltip.node.kind === "family" ? (
-                <>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-                      style={{ backgroundColor: FAMILY_COLORS[tooltip.node.familyType || ""] || tooltip.node.color }}>
-                      {(tooltip.node.familyType || "")[0]}
-                    </div>
-                    <span className="text-white font-semibold text-sm">{tooltip.node.familySkillName}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-[10px] mt-1">
-                    <span className="text-white/50">{tooltip.node.familyType}</span>
-                    <span className="text-white/30">|</span>
-                    <span style={{ color: tooltip.node.color }} className="font-semibold capitalize">{tooltip.node.aggregateSeverity}</span>
-                    <span className="text-white/40">Level {tooltip.node.level}</span>
-                  </div>
-                  {tooltip.node.avgOpt !== undefined && (
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <span className="text-[9px] text-white/30">Opt Impact</span>
-                      <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{
-                          width: `${tooltip.node.avgOpt * 100}%`,
-                          backgroundColor: tooltip.node.avgOpt >= 0.4 ? "#22c55e" : tooltip.node.avgOpt >= 0.2 ? "#f59e0b" : "#ef4444",
-                        }} />
-                      </div>
-                      <span className="text-[9px] text-white/50 font-mono">{(tooltip.node.avgOpt * 100).toFixed(0)}%</span>
-                    </div>
-                  )}
-                  <div className="text-[9px] text-white/40 mt-1">{tooltip.node.childCount} green skill{tooltip.node.childCount !== 1 ? "s" : ""} at this level</div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: tooltip.node.color }}>
-                      {tooltip.node.level}
-                    </div>
-                    <span className="text-white font-semibold text-sm">{tooltip.node.label}</span>
-                  </div>
-                  <p className="text-[10px] text-white/50 mb-1">{tooltip.node.description}</p>
-                  <div className="text-[10px] text-white/25 mt-1">Click to expand maturity details</div>
                 </>
               )}
             </motion.div>

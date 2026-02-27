@@ -15,6 +15,15 @@ interface KPISidebarProps {
   viewLevel: ViewLevel;
 }
 
+/** Properly escape a CSV cell — quote any value that contains comma, quote, or newline */
+function csvCell(val: unknown): string {
+  const s = String(val ?? "");
+  if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
 function exportCSV(departments: Department[], skills: GreenSkill[]) {
   const headers = [
     "Department", "Skill Family", "Green Skill", "Theme",
@@ -28,33 +37,44 @@ function exportCSV(departments: Department[], skills: GreenSkill[]) {
     s.current_level, s.required_level, s.gap, s.severity,
     s.priority_level, getMaturityLabel(s.current_level), getMaturityLabel(s.required_level),
     (computeSkillRiskScore(s) * 100).toFixed(0) + "%",
-    `"${(s.description || "").replace(/"/g, '""')}"`,
-    `"${(s.why_it_matters || "").replace(/"/g, '""')}"`,
+    s.description || "", s.why_it_matters || "",
     ...OPT_COLUMNS.map(c => Number((s as any)[c]) || 0),
-  ]);
-  const deptHeaders = ["Department", "Overall Score", "Gap Severity", "Priority", "Risk Score", "Critical Gaps", "Moderate Gaps", "No Gap", "Desired Knowledge", "Top Gaps"];
+  ].map(csvCell));
+
+  const deptHeaders = [
+    "Department", "Overall Score", "Gap Severity", "Priority", "Risk Score",
+    "Critical Gaps", "Moderate Gaps", "No Gap",
+    "Avg Opt Score",
+    ...OPT_COLUMNS.map(c => formatOptLabel(c)),
+    "Desired Knowledge", "Top Gaps",
+  ];
   const deptRows = departments.map(d => [
     d.label, d.overall_score, d.gap_severity, d.priority_level,
     (computeDeptRiskScore(d, skills) * 100).toFixed(0) + "%",
     d.critical_gap_count, d.moderate_gap_count, d.no_gap_count,
-    `"${(d.desired_knowledge || "").replace(/"/g, '""')}"`,
-    `"${(d.top_gaps || "").replace(/"/g, '""')}"`,
-  ]);
+    (computeAvgOpt(d) * 100).toFixed(0) + "%",
+    ...OPT_COLUMNS.map(c => ((Number((d as any)[c]) || 0) * 100).toFixed(0) + "%"),
+    d.desired_knowledge || "", d.top_gaps || "",
+  ].map(csvCell));
+
   const csv = [
-    "=== DEPARTMENT SUMMARY ===",
-    deptHeaders.join(","),
-    ...deptRows.map(r => r.join(",")),
-    "",
-    "=== FULL SKILLS DATA ===",
     headers.join(","),
     ...rows.map(r => r.join(",")),
+    "",
+    "DEPARTMENT SUMMARY",
+    deptHeaders.join(","),
+    ...deptRows.map(r => r.join(",")),
   ].join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  const BOM = "\uFEFF"; // UTF-8 BOM for Excel compatibility
+  const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = `greenpulse_gap_analysis_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 

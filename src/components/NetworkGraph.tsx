@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import * as d3 from "d3";
 import { Department, DepartmentEdge } from "@/lib/types";
-import { getSeverityGlowColor } from "@/lib/utils";
+import { getSeverityGlowColor, computeAvgOpt } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NetworkGraphProps {
@@ -112,11 +112,11 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
       })
       .on("click", (_, d) => onNodeClick(d.dept));
 
-    // Score text inside nodes
+    // Avg opt score % inside nodes
     const scoreText = container.append("g").selectAll("text").data(nodes).enter().append("text")
       .attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "white")
-      .attr("font-size", "13px").attr("font-weight", "700").style("pointer-events", "none")
-      .text((d) => d.dept.overall_score);
+      .attr("font-size", "12px").attr("font-weight", "700").style("pointer-events", "none")
+      .text((d) => `${(computeAvgOpt(d.dept) * 100).toFixed(0)}%`);
 
     // Labels below
     const labelText = container.append("g").selectAll("text").data(nodes).enter().append("text")
@@ -191,7 +191,7 @@ export default function NetworkGraph({ departments, edges, onNodeClick }: Networ
               </span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-white/60">
-              <div>Overall Score: <span className="text-white font-medium">{tooltip.dept.overall_score}</span></div>
+              <div>Avg Opt Score: <span className="text-white font-medium">{(computeAvgOpt(tooltip.dept) * 100).toFixed(0)}%</span></div>
               <div>Priority: <span className="text-white font-medium">{tooltip.dept.priority_level}</span></div>
               <div>Critical Gaps: <span className="text-red-400 font-medium">{tooltip.dept.critical_gap_count}</span></div>
               <div>Moderate Gaps: <span className="text-amber-400 font-medium">{tooltip.dept.moderate_gap_count}</span></div>
