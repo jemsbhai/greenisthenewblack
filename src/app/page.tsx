@@ -234,7 +234,7 @@ export default function Home() {
       </div>
 
       {/* KPI Sidebar */}
-      <KPISidebar departments={departments} allSkills={allSkills} />
+      <KPISidebar departments={departments} allSkills={allSkills} selectedDept={selectedDept} currentSkills={currentSkills} />
 
       {/* Skill Detail Drawer */}
       <AnimatePresence>
