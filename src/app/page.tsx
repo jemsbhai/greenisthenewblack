@@ -204,6 +204,8 @@ export default function Home() {
               <SkillFamilyGraph
                 department={selectedDept}
                 skills={currentSkills}
+                edges={edges}
+                allDepartments={departments}
                 onFamilyClick={handleFamilyClick}
                 onBack={() => handleNavigate("departments")}
               />
@@ -234,7 +236,7 @@ export default function Home() {
       </div>
 
       {/* KPI Sidebar */}
-      <KPISidebar departments={departments} allSkills={allSkills} selectedDept={selectedDept} currentSkills={currentSkills} />
+      <KPISidebar departments={departments} allSkills={allSkills} selectedDept={selectedDept} currentSkills={currentSkills} viewLevel={viewLevel} />
 
       {/* Skill Detail Drawer */}
       <AnimatePresence>

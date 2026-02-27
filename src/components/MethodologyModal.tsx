@@ -116,20 +116,36 @@ export default function MethodologyModal({ onClose }: MethodologyModalProps) {
 
           <section>
             <h3 className="text-white font-semibold mb-2">Node Color Legend</h3>
+            <p className="mb-2">
+              Department node colors are driven by <strong className="text-white/90">gap severity</strong>{" "}
+              calculated from the distribution of critical, moderate, and no-gap
+              skills within each department.
+            </p>
             <div className="flex gap-4 mt-1">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-red-500 shadow shadow-red-500/50" />
-                <span>&lt; 25%</span>
+                <span>Critical</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-amber-500 shadow shadow-amber-500/50" />
-                <span>25–50%</span>
+                <span>Moderate</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-green-500 shadow shadow-green-500/50" />
-                <span>&gt; 50%</span>
+                <span>Healthy</span>
               </div>
             </div>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-2">CSV Export</h3>
+            <p>
+              Export a complete gap analysis report including all department
+              summaries, skill-level data, severity classifications, and 16
+              optimization factor scores. Use the{" "}
+              <strong className="text-white/90">Export CSV</strong> button in the
+              sidebar.
+            </p>
           </section>
         </div>
       </motion.div>
