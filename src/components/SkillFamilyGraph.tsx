@@ -63,6 +63,43 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
   const [expandedSector, setExpandedSector] = useState<string | null>(null);
   const [assessmentTheme, setAssessmentTheme] = useState<string | null>(null);
 
+  // Resizable drawer state
+  const [drawerWidth, setDrawerWidth] = useState(440);
+  const isDrawerDragging = useRef(false);
+  const drawerStartX = useRef(0);
+  const drawerStartWidth = useRef(440);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDrawerDragging.current) return;
+      const delta = drawerStartX.current - e.clientX;
+      const newWidth = Math.min(900, Math.max(280, drawerStartWidth.current + delta));
+      setDrawerWidth(newWidth);
+    };
+    const handleMouseUp = () => {
+      if (isDrawerDragging.current) {
+        isDrawerDragging.current = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  const handleDrawerResizeStart = useCallback((e: React.MouseEvent) => {
+    isDrawerDragging.current = true;
+    drawerStartX.current = e.clientX;
+    drawerStartWidth.current = drawerWidth;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  }, [drawerWidth]);
+
   const deptLabel = department.label || department.department;
   const directoryData = useMemo(() => getDeptDirectoryData(deptLabel), [deptLabel]);
   const priorityActions = useMemo(() => getPriorityActions(department, skills), [department, skills]);
@@ -464,9 +501,18 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
       <AnimatePresence>
         {drawerOpen && (
           <motion.div
-            initial={{ width: 0, opacity: 0 }} animate={{ width: 440, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
+            initial={{ width: 0, opacity: 0 }} animate={{ width: drawerWidth, opacity: 1 }} exit={{ width: 0, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="h-full bg-[#0c0c24]/95 backdrop-blur-md border-l border-white/10 flex flex-col overflow-hidden"
+            className="h-full flex overflow-hidden"
+          >
+            {/* Drag handle */}
+            <div
+              onMouseDown={handleDrawerResizeStart}
+              className="w-1.5 flex-shrink-0 cursor-col-resize group relative z-10 hover:bg-green-500/20 active:bg-green-500/30 transition-colors"
+            >
+              <div className="absolute inset-y-0 left-0 w-0.5 bg-white/5 group-hover:bg-green-500/40 transition-colors" />
+            </div>
+            <div className="flex-1 min-w-0 h-full bg-[#0c0c24]/95 backdrop-blur-md border-l border-white/10 flex flex-col overflow-hidden"
           >
             {/* Drawer Header */}
             <div className="px-5 py-4 border-b border-white/5 flex-shrink-0">
@@ -1032,6 +1078,7 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
                   )}
                 </div>
               )}
+            </div>
             </div>
           </motion.div>
         )}
