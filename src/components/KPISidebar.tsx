@@ -162,7 +162,7 @@ export default function KPISidebar({ departments, allSkills, selectedDept, curre
     <>
       <motion.div
         initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-        className="w-80 flex-shrink-0 bg-[#0c0c24]/80 backdrop-blur-md border-l border-white/5 flex flex-col overflow-y-auto"
+        className="flex-1 min-w-0 bg-[#0c0c24]/80 backdrop-blur-md border-l border-white/5 flex flex-col overflow-y-auto"
       >
         {/* Logo + Export */}
         <div className="px-5 pt-4 pb-3 border-b border-white/5">

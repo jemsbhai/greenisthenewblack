@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Department,
@@ -37,6 +37,43 @@ export default function Home() {
   const [selectedFamily, setSelectedFamily] = useState<SkillFamily | null>(null);
   const [familySkills, setFamilySkills] = useState<GreenSkill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<GreenSkill | null>(null);
+
+  // Resizable sidebar state
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(320);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = startX.current - e.clientX;
+      const newWidth = Math.min(700, Math.max(200, startWidth.current + delta));
+      setSidebarWidth(newWidth);
+    };
+    const handleMouseUp = () => {
+      if (isDragging.current) {
+        isDragging.current = false;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = sidebarWidth;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  }, [sidebarWidth]);
 
   // Load data
   useEffect(() => {
@@ -237,8 +274,17 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
-      {/* KPI Sidebar */}
-      <KPISidebar departments={departments} allSkills={allSkills} selectedDept={selectedDept} currentSkills={currentSkills} viewLevel={viewLevel} />
+      {/* KPI Sidebar — resizable */}
+      <div className="relative flex-shrink-0 flex" style={{ width: sidebarWidth }}>
+        {/* Drag handle */}
+        <div
+          onMouseDown={handleResizeStart}
+          className="w-1.5 flex-shrink-0 cursor-col-resize group relative z-10 hover:bg-green-500/20 active:bg-green-500/30 transition-colors"
+        >
+          <div className="absolute inset-y-0 left-0 w-0.5 bg-white/5 group-hover:bg-green-500/40 transition-colors" />
+        </div>
+        <KPISidebar departments={departments} allSkills={allSkills} selectedDept={selectedDept} currentSkills={currentSkills} viewLevel={viewLevel} />
+      </div>
 
       {/* Skill Detail Drawer */}
       <AnimatePresence>
