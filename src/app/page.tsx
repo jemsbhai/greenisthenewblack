@@ -21,6 +21,8 @@ import SkillsGraph from "@/components/SkillsGraph";
 import SkillDetailDrawer from "@/components/SkillDetailDrawer";
 import KPISidebar from "@/components/KPISidebar";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { useSearchParams } from "next/navigation";
+import { fetchCompanyDepartmentScores, fetchCompanySkillGaps } from "@/lib/queries";
 
 export default function Home() {
   // Data state
@@ -44,6 +46,47 @@ export default function Home() {
   const startX = useRef(0);
   const startWidth = useRef(320);
 
+  
+  // Inside the component:
+  const searchParams = useSearchParams();
+  const companyId = searchParams.get("company_id");
+  
+  // Replace the loadData useEffect with:
+  useEffect(() => {
+  async function loadData() {
+  try {
+  setLoading(true);
+  if (companyId) {
+  // Company-specific view (post-assessment)
+  const [depts, edgesData, skills] = await Promise.all([
+  fetchCompanyDepartmentScores(companyId),
+  fetchEdges(),
+  fetchCompanySkillGaps(companyId),
+  ]);
+  setDepartments(depts);
+  setEdges(edgesData);
+  setAllSkills(skills);
+  } else {
+  // Static/demo view (original behavior)
+  const [depts, edgesData, skills] = await Promise.all([
+  fetchDepartments(),
+  fetchEdges(),
+  fetchAllSkills(),
+  ]);
+  setDepartments(depts);
+  setEdges(edgesData);
+  setAllSkills(skills);
+  }
+  } catch (err) {
+  console.error("Failed to load data:", err);
+  setError("Failed to connect to database.");
+  } finally {
+  setLoading(false);
+  }
+  }
+  loadData();
+  }, [companyId]);
+  
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
