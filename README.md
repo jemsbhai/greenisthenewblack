@@ -18,8 +18,7 @@ Most enterprises have no idea which teams lack the green skills they need to mee
 
 ## Live demo
 
-[greenisthenewblack.vercel.app](https://greenisthenewblack.vercel.app)
-
+https://greenpath-onboard.lovable.app/
 ---
 
 ## What you can do in 2–3 minutes
