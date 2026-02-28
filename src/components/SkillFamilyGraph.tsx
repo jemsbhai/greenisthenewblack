@@ -191,7 +191,14 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
     lMerge.append("feMergeNode").attr("in", "blur");
     lMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
-    const container = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const container = svg.append("g");
+
+    // ── Zoom & pan ──
+    const zoom = d3.zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.2, 3])
+      .on("zoom", (event) => container.attr("transform", event.transform));
+    svg.call(zoom);
+    svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.85));
 
     // ── Links ──
     const linkGroup = container.append("g").selectAll("line").data(links).enter().append("line")
@@ -322,6 +329,19 @@ export default function SkillFamilyGraph({ department, skills, edges, allDepartm
         leafNodeGroup.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
         leafLabelGroup.attr("x", (d) => d.x!).attr("y", (d) => d.y!);
       });
+
+    // ── Node dragging ──
+    const optDrag = d3.drag<SVGCircleElement, GraphNode>()
+      .on("start", (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on("end", (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; });
+    optNodeGroup.call(optDrag);
+
+    const leafDrag = d3.drag<SVGCircleElement, GraphNode>()
+      .on("start", (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on("drag", (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on("end", (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; });
+    leafNodeGroup.call(leafDrag);
 
     return () => { simulation.stop(); };
   }, [department, skills, deptLabel]);
