@@ -8,13 +8,11 @@
 
 ## What it does
 
-GreenPulse helps HR leaders and ESG leads identify exactly where their organisation is not climate-ready — by role, department, and skill family — in under 3 minutes.
+GreenPulse helps identify exactly where an organisation is not climate-ready — by role, department, and skill family — in under 3 minutes.
 
-It maps green skills across departments, scores current capability against required maturity levels, and surfaces the gaps that matter most: the critical ones that carry real regulatory and operational risk.
+It maps green skills across departments, scores current capability against required maturity levels, and calculates **operational optimisation impact scores** across 16 real-world sustainability factors — including HVAC efficiency, renewable energy adoption, carbon footprint, solar/fleet electrification, supply chain emissions, water use, digital footprint, AI compute, IoT telemetry, hardware circularity, and more. These factors are used to weight each skill's risk score: a gap in a high-impact area (e.g. a team responsible for HVAC or logistics with zero renewable energy capability) scores far higher than a gap in a low-impact area.
 
-## Why it matters
-
-Most enterprises have no idea which teams lack the green skills they need to meet net-zero commitments, comply with emerging climate regulation, or execute sustainability strategy. GreenPulse makes that visible — fast.
+All of this is rendered as an **interactive neural network graph** — departments appear as nodes, sized and coloured by risk, connected by relationship edges. Critical gaps pulse red. Click any node to drill through skill families and individual skills, with live KPI metrics updating in the sidebar as you navigate.
 
 ## Live demo
 
